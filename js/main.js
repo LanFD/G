@@ -1,4 +1,4 @@
-//@author Lenne  mail 623975749@qq.com
+//@author Ht  mail 382354412@qq.com
 var textObj          = document.getElementById('content');
 var nextSentenceTime = 1000; //句子间隔时间
 var wordTime         = 240;  //字间隔时间
@@ -71,7 +71,6 @@ var sentences = {
             fin();
         }
     }
-
 };
 var core = {
     arr:       [],
@@ -188,7 +187,6 @@ function autoPlay(){
        auto = 0;
    }
 }
-
 
 
 window.onload = function () {
