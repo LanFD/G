@@ -3,31 +3,100 @@ var textObj          = document.getElementById('content');
 var nextSentenceTime = 1000;
 var wordTime         = 240;
 var nowChapter       = 1;
+var auto             = 0;
 var story;
 var interval;
+
+
+var d       = new Date();
+var nowTime = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate() + ' '
+              + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+
 function log(x) {
     console.log(x);
 }
+
+function getText(cb) {
+    var url = 'script/' + nowChapter + '.json';
+    $.ajax({
+               type:     'get',
+               url:      url,
+               dataType: 'json',
+               //async:    false,
+               success:  function (d) {
+                   if (d) {
+                       story = d;
+                       log(d);
+                       cb();
+                   } else {
+                       fin();
+                   }
+
+               },
+               error:    function (d) {
+                   alert(d.status);
+                   if (d.status == 404) {
+                       fin();
+                   }
+               }
+
+           }
+    );
+}
+
+var sentences = {
+    pos:         0,
+    length:      0,
+    toType:      '',
+    getStory:    function () {
+        var cb = function () {
+            sentences.getLength();
+            sentences.charge();
+        };
+        getText(cb);
+    },
+    getSentence: function () {
+        this.toType = story[this.pos];
+    },
+    getLength:   function () {
+        this.length = story.length;
+    },
+    charge:      function () {
+        if (this.pos < this.length) {
+            this.getSentence();
+            this.pos++;
+            type(this.toType);
+        } else {
+            fin();
+        }
+    }
+
+};
 var core = {
     arr:       [],
     length:    0,
     pos:       0,
-    next:      0,
-    toType:    '这是示例文本 aya ~~~ OAO',
+    toNext:    0,
+    toType:    '',
     getArr:    function () {
-        this.arr = this.toType.split('');
+        log(this.toType);
+        if(typeof (this.toType['text'])=='string'){
+            this.arr = this.toType['text'].split('');
+        }else {
+            this.arr = this.toType.split('');
+        }
+
     },
     getLength: function () {
         this.length = this.arr.length;
     },
     start:     function () {
         interval = setInterval(function () {
-            log(core.arr[core.pos]);
             if (typeof(core.arr[core.pos]) == 'undefined') {
                 clearInterval(interval);
                 core.ini();
                 core.beginNext();
-            }else {
+            } else {
                 textObj.innerHTML += core.arr[core.pos];
                 core.pos++;
             }
@@ -37,7 +106,7 @@ var core = {
     finish:    function () {
         clearInterval(interval);
         (function () {
-            for (i = core.pos; i < core.length ; i++) {
+            for (i = core.pos; i < core.length; i++) {
                 textObj.innerHTML += core.arr[i];
             }
         })();
@@ -45,13 +114,17 @@ var core = {
         core.beginNext();
     },
     beginNext: function () {
-        this.next = 1;
+        if (auto == 1 || core.toNext == 1) {
+            sentences.charge();
+        } else {
+            core.toNext = 1;
+        }
     },
     ini:       function () {
-            this.arr    = [];
-            this.pos    = 0;
-            this.length = 0;
-            this.next   = 0;
+        this.arr    = [];
+        this.pos    = 0;
+        this.length = 0;
+        this.next   = 0;
     }
 };
 
@@ -65,8 +138,19 @@ function type(toType) {
     core.start();
 }
 
+function start() {
+    sentences.getStory();
+}
+
 function finish() {
-    core.finish();
+    if(core.toNext == 1){
+        textClear();
+        core.toNext = 0;
+        sentences.charge();
+    }else {
+        core.finish();
+    }
+
 }
 
 function textClear() {
@@ -79,59 +163,16 @@ function fin() {
     type('      F     i     n ');
 }
 
-var d     = new Date();
-var today = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate() + ' '
-            + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+function autoPlay(){
 
-
-function auto(story) {
-    var l   = story.length;
-    var p   = 0;
-    var txt = story[p];
-    var cb  = function () {
-        p++;
-        if (p < l) {
-            textClear();
-            var txt = story[p];
-            type(txt, cb)
-        } else {
-            fin();
-        }
-    };
-    type(txt);
 }
 
-function getText(cb) {
-    var url = 'script/' + nowChapter + '.json';
-    $.ajax({
-               type:     'get',
-               url:      url,
-               dataType: 'json',
-               //async:    false,
-               success:  function (d) {
-                   if(d){
-                       story = d;
-                       cb();
-                   }else {
-                       fin();
-                   }
 
-               },
-               error:function(d){
-                   if(d.status ==404){
-                       fin();
-                   }
-               }
-
-           }
-    );
-}
 
 window.onload = function () {
-    var then = setTimeout(function () {
-        type();
-    }, 2000);
-    getText(then);
-
+    setTimeout(
+        function(){
+            start()
+        },2000);
 };
 
