@@ -1,13 +1,14 @@
 //@author Lenne  mail 623975749@qq.com
 var textObj          = document.getElementById('content');
-var nextSentenceTime = 1000;
-var wordTime         = 240;
-var nowChapter       = 1;
-var auto             = 0;
+var nextSentenceTime = 1000; //句子间隔时间
+var wordTime         = 240;  //字间隔时间
+var nowChapter       = 1;    //第几章节
+var auto             = 0;    //是否auto play
+
+
 var story;
 var interval;
-
-
+var end;
 var d       = new Date();
 var nowTime = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate() + ' '
               + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
@@ -95,7 +96,10 @@ var core = {
             if (typeof(core.arr[core.pos]) == 'undefined') {
                 clearInterval(interval);
                 core.ini();
-                core.beginNext();
+                if(end != 1){
+                    core.beginNext();
+                }
+
             } else {
                 textObj.innerHTML += core.arr[core.pos];
                 core.pos++;
@@ -114,7 +118,12 @@ var core = {
         core.beginNext();
     },
     beginNext: function () {
-        if (auto == 1 || core.toNext == 1) {
+        if (auto == 1){
+            setTimeout(function(){
+                textClear();
+                sentences.charge();
+            },nextSentenceTime);
+        } else if(core.toNext == 1) {
             sentences.charge();
         } else {
             core.toNext = 1;
@@ -143,6 +152,9 @@ function start() {
 }
 
 function finish() {
+    if(end == 1){
+        return;
+    }
     if(core.toNext == 1){
         textClear();
         core.toNext = 0;
@@ -159,12 +171,22 @@ function textClear() {
 
 function fin() {
     textClear();
+    auto = 0;
+    end  = 1;
     textObj.className = 'fin';
     type('      F     i     n ');
 }
 
 function autoPlay(){
-
+   if(auto == 0){
+       auto = 1;
+       if(core.toNext == 1){
+           textClear();
+           sentences.charge();
+       }
+   }else {
+       auto = 0;
+   }
 }
 
 
