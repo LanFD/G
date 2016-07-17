@@ -4,8 +4,8 @@ var nextSentenceTime = 1000; //句子间隔时间
 var wordTime         = 240;  //字间隔时间
 var nowChapter       = 1;    //第几章节
 var auto             = 0;    //是否auto play
-var storyname        = 'storyname1';
-
+var begin            = 0;    //是否开始阅读
+var storyName        = 'storyname1';
 
 var story;
 var interval;
@@ -19,7 +19,7 @@ function log(x) {
 }
 
 function getText(cb) {
-    var url = 'script/' +storyname +'/' + nowChapter + '.json';
+    var url = 'script/' + storyName + '/' + nowChapter + '.json';
     $.ajax({
                type:     'get',
                url:      url,
@@ -28,7 +28,7 @@ function getText(cb) {
                success:  function (d) {
                    if (d) {
                        story = d;
-                       log(d);
+                       //log(d);
                        cb();
                    } else {
                        fin();
@@ -36,7 +36,7 @@ function getText(cb) {
 
                },
                error:    function (d) {
-                   alert(d.status);
+                   //alert(d.status);
                    if (d.status == 404) {
                        fin();
                    }
@@ -69,11 +69,14 @@ var sentences = {
             this.pos++;
             type(this.toType);
         } else {
-            fin();
+            this.pos = 0;
+            // alert('now:'+nowChapter);
+            nowChapter++;
+            this.getStory();
         }
     }
 };
-var core = {
+var core      = {
     arr:       [],
     length:    0,
     pos:       0,
@@ -81,9 +84,9 @@ var core = {
     toType:    '',
     getArr:    function () {
         log(this.toType);
-        if(typeof (this.toType['text'])=='string'){
+        if (typeof (this.toType['text']) == 'string') {
             this.arr = this.toType['text'].split('');
-        }else {
+        } else {
             this.arr = this.toType.split('');
         }
 
@@ -96,7 +99,7 @@ var core = {
             if (typeof(core.arr[core.pos]) == 'undefined') {
                 clearInterval(interval);
                 core.ini();
-                if(end != 1){
+                if (end != 1) {
                     core.beginNext();
                 }
 
@@ -118,12 +121,12 @@ var core = {
         core.beginNext();
     },
     beginNext: function () {
-        if (auto == 1){
-            setTimeout(function(){
+        if (auto == 1) {
+            setTimeout(function () {
                 textClear();
                 sentences.charge();
-            },nextSentenceTime);
-        } else if(core.toNext == 1) {
+            }, nextSentenceTime);
+        } else if (core.toNext == 1) {
             sentences.charge();
         } else {
             core.toNext = 1;
@@ -148,18 +151,19 @@ function type(toType) {
 }
 
 function start() {
+    begin = 1;
     sentences.getStory();
 }
 
 function finish() {
-    if(end == 1){
+    if (end == 1 || begin ==0) {
         return;
     }
-    if(core.toNext == 1){
+    if (core.toNext == 1) {
         textClear();
         core.toNext = 0;
         sentences.charge();
-    }else {
+    } else {
         core.finish();
     }
 
@@ -171,39 +175,47 @@ function textClear() {
 
 function fin() {
     textClear();
-    auto = 0;
-    end  = 1;
+    auto              = 0;
+    end               = 1;
     textObj.className = 'fin';
     type('      F     i     n ');
 }
 
-function autoPlay(){
-   if(auto == 0){
-       auto = 1;
-       if(core.toNext == 1){
-           textClear();
-           sentences.charge();
-       }
-   }else {
-       auto = 0;
-   }
+function autoPlay() {
+    if (auto == 0) {
+        auto = 1;
+        if (core.toNext == 1) {
+            textClear();
+            sentences.charge();
+        }
+    } else {
+        auto = 0;
+    }
     showAuto();
 }
 
-function showAuto(){
+function waitToClick(){
+    var c = '<span id="waitToClick" style="display: none">click</span>';
+
+    (function (){
+        $('#waitToClick').hide(1000);
+    })()
+}
+
+function showAuto() {
     var html;
-    if(auto == 1){
+    if (auto == 1) {
         html = 'on';
-    }else {
-        html ='off';
+    } else {
+        html = 'off';
     }
     $('#autoPlay').html(html)
 }
 
 window.onload = function () {
     setTimeout(
-        function(){
+        function () {
             start()
-        },2000);
+        }, 2000);
 };
 
