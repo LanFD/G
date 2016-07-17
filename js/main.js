@@ -6,13 +6,14 @@ var nowChapter       = 1;    //第几章节
 var auto             = 0;    //是否auto play
 var begin            = 0;    //是否开始阅读
 var storyName        = 'storyname1';
-
+var tkl;                    //click 闪烁
 var story;
 var interval;
 var end;
-var d       = new Date();
-var nowTime = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate() + ' '
-              + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+var scenePath        = 'img/scene/';
+var d                = new Date();
+var nowTime          = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate() + ' '
+                       + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
 
 function log(x) {
     console.log(x);
@@ -76,25 +77,60 @@ var sentences = {
         }
     }
 };
-var core      = {
+
+function changeScene(x) {
+
+    var rand = parseInt(Math.random() * 10);
+   //  rand = 1;
+    log(rand);
+    switch (rand) {
+        case 0 :
+            $('#scene').fadeOut(nextSentenceTime / 2, function () {
+                $('#scene').attr('src', scenePath + x);
+                $('#scene').fadeIn(0)
+            });
+            break;
+
+        case 1:
+            $('#scene').animate({right:'200%', opacity: 0.1}, nextSentenceTime/2, function(){
+                $('#scene').attr('src', scenePath + x);
+                $('#scene').animate({left:'0%' , opacity: 1}, 0);
+            });
+
+            break;
+        default:
+            $('#scene').fadeOut(nextSentenceTime / 2, function () {
+                $('#scene').attr('src', scenePath + x);
+                $('#scene').fadeIn(0)
+            });
+    }
+
+
+
+
+    $('#scene').fadeOut(nextSentenceTime / 2, function () {
+        $('#scene').attr('src', scenePath + x);
+        $('#scene').fadeIn(nextSentenceTime / 2)
+    });
+}
+var core = {
     arr:       [],
     length:    0,
     pos:       0,
     toNext:    0,
     toType:    '',
-    getArr:    function () {
-        log(this.toType);
+    start:     function () {
+        //log(this.toType);
         if (typeof (this.toType['text']) == 'string') {
             this.arr = this.toType['text'].split('');
         } else {
             this.arr = this.toType.split('');
         }
-
-    },
-    getLength: function () {
         this.length = this.arr.length;
-    },
-    start:     function () {
+        if (typeof (this.toType['scene']) == 'string') {
+            //场景切换
+            changeScene(this.toType['scene']);
+        }
         interval = setInterval(function () {
             if (typeof(core.arr[core.pos]) == 'undefined') {
                 clearInterval(interval);
@@ -108,7 +144,8 @@ var core      = {
                 core.pos++;
             }
 
-        }, wordTime)
+        }, wordTime);
+       // log('i=' + interval);
     },
     finish:    function () {
         clearInterval(interval);
@@ -128,8 +165,12 @@ var core      = {
             }, nextSentenceTime);
         } else if (core.toNext == 1) {
             sentences.charge();
+            //  waitToClick();
         } else {
             core.toNext = 1;
+            setTimeout(function () {
+                waitToClick();
+            }, nextSentenceTime);
         }
     },
     ini:       function () {
@@ -145,8 +186,6 @@ function type(toType) {
         core.toType = toType;
     }
     core.ini();
-    core.getArr();
-    core.getLength();
     core.start();
 }
 
@@ -156,12 +195,13 @@ function start() {
 }
 
 function finish() {
-    if (end == 1 || begin ==0) {
+    if (end == 1 || begin == 0 || auto == 1) {
         return;
     }
     if (core.toNext == 1) {
         textClear();
         core.toNext = 0;
+        clearInterval(tkl);
         sentences.charge();
     } else {
         core.finish();
@@ -194,12 +234,23 @@ function autoPlay() {
     showAuto();
 }
 
-function waitToClick(){
-    var c = '<span id="waitToClick" style="display: none">click</span>';
+function twinkle(x) {
+    tkl = setInterval(function () {
+        if (core.toNext == 1) {
+            x.fadeIn(1000).fadeOut(1000);
+        } else {
+            clearInterval(tkl);
+        }
 
-    (function (){
-        $('#waitToClick').hide(1000);
-    })()
+    }, 2000);
+}
+
+function waitToClick() {
+    var c     = '<span id="waitToClick" style="color: cyan;display: none;position: absolute;bottom: 5px;right: 10px">   click</span>';
+    textObj.innerHTML += c;
+    var toTkl = $('#waitToClick');
+    twinkle(toTkl);
+
 }
 
 function showAuto() {
@@ -216,6 +267,6 @@ window.onload = function () {
     setTimeout(
         function () {
             start()
-        }, 2000);
+        }, 1000);
 };
 

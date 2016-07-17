@@ -10,10 +10,12 @@
           {"name":"sway","delay":"3w","times":1,"sound":"pencil"}
         ]
       }
-    ]
+    ],
+    "scene":"s2.jpg"
   },
   {
-    "text": "这是第2句"
+    "text": "这是第2句",
+    "scene":"s3.jpg"
   },
   {
     "text": "这是第3句"
