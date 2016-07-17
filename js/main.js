@@ -4,6 +4,7 @@ var nextSentenceTime = 1000; //句子间隔时间
 var wordTime         = 240;  //字间隔时间
 var nowChapter       = 1;    //第几章节
 var auto             = 0;    //是否auto play
+var storyname        = 'storyname1';
 
 
 var story;
@@ -18,7 +19,7 @@ function log(x) {
 }
 
 function getText(cb) {
-    var url = 'script/' + nowChapter + '.json';
+    var url = 'script/' +storyname +'/' + nowChapter + '.json';
     $.ajax({
                type:     'get',
                url:      url,
@@ -186,8 +187,18 @@ function autoPlay(){
    }else {
        auto = 0;
    }
+    showAuto();
 }
 
+function showAuto(){
+    var html;
+    if(auto == 1){
+        html = 'on';
+    }else {
+        html ='off';
+    }
+    $('#autoPlay').html(html)
+}
 
 window.onload = function () {
     setTimeout(
