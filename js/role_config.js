@@ -9,4 +9,4 @@ roles        = {
         name: 'assassin',
         path: rolePath + 'role2'
     }
-}
+};

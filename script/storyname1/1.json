@@ -3,7 +3,7 @@
     "text": "这是第一句",
     "role": [
       {
-        "name": "role1",
+        "id": "firstRole",
         "pos": 0.1,
         "status": "",
         "action": [
