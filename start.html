@@ -4,6 +4,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <meta name="full-screen" content="yes">
+    <link href="css/animate.min.css">
     <title>Ht Works</title>
     <style>
         *{
@@ -31,6 +32,15 @@
             background-color: black;
             min-height: 300px;
             max-height: 100%;
+            -webkit-backface-visibility: hidden;
+            -moz-backface-visibility: hidden;
+            backface-visibility: hidden;
+            -webkit-transform: translate3d(0, 0, 0);
+            -moz-transform: translate3d(0, 0, 0);
+            transform: translate3d(0, 0, 0);
+            -webkit-transform-style: preserve-3d;
+            -moz-transform-style: preserve-3d;
+            transform-style: preserve-3d;
         }
         .text {
             position: absolute;
@@ -91,4 +101,6 @@
 </body>
 </html>
 <script src="js/jquery-3.0.0.min.js"></script>
+<script src="js/role_config.js"></script>
 <script src="js/main.js"></script>
+
