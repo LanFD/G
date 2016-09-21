@@ -15,8 +15,34 @@ var d                = new Date();
 var nowTime          = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate() + ' '
                        + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
 
+
+$(".toolMask").mouseover(function(){
+    $(".tool").fadeIn(300);
+});
+
+$(".toolMask").mouseleave(function(){
+    $(".tool").fadeOut(300);
+});
+
+function bgmSwitch(){
+    var audio = $('#audio')[0];
+    event.stopPropagation();
+    if(audio.paused){
+        audio.play();
+        $('#bgm').html('on');
+    }else {
+        audio.pause();
+        $('#bgm').html('off');
+    }
+}
+
 function log(x) {
     console.log(x);
+}
+
+function changeScene(x) {
+    $(nextSceneId).attr('src', scenePath + x);
+    changeView();
 }
 
 function getText(cb) {
@@ -78,41 +104,6 @@ var sentences = {
     }
 };
 
-function changeScene(x) {
-
-    var rand = parseInt(Math.random() * 10);
-   //  rand = 1;
-    log(rand);
-    switch (rand) {
-        case 0 :
-            $('#scene').fadeOut(nextSentenceTime / 2, function () {
-                $('#scene').attr('src', scenePath + x);
-                $('#scene').fadeIn(0)
-            });
-            break;
-
-        case 1:
-            $('#scene').animate({right:'200%', opacity: 0.1}, nextSentenceTime/2, function(){
-                $('#scene').attr('src', scenePath + x);
-                $('#scene').animate({left:'0%' , opacity: 1}, 0);
-            });
-
-            break;
-        default:
-            $('#scene').fadeOut(nextSentenceTime / 2, function () {
-                $('#scene').attr('src', scenePath + x);
-                $('#scene').fadeIn(0)
-            });
-    }
-
-
-
-
-    $('#scene').fadeOut(nextSentenceTime / 2, function () {
-        $('#scene').attr('src', scenePath + x);
-        $('#scene').fadeIn(nextSentenceTime / 2)
-    });
-}
 var core = {
     arr:       [],
     length:    0,

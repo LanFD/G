@@ -4,105 +4,49 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <meta name="full-screen" content="yes">
-    <link href="css/animate.min.css">
-    <link href="css/sceneChange.css">
+    <link href="css/main.css" rel="stylesheet">
+    <link href="css/animate.min.css" rel="stylesheet">
+    <link href="css/sceneChange.css" rel="stylesheet">
+    <script src="js/modernizr.custom.js"></script>
+    <script src="js/jquery-3.0.0.min.js"></script>
+    <script src="js/sceneChange.js"></script>
     <title>Ht Works</title>
-    <style>
-        *{
-            margin: 0;
-            padding: 0;
-        }
-        @media (min-width: 1080px){
-            .main{
-                margin: 30px auto 0;
-                width: 80%;
-            }
-        }
-
-        @media (max-width: 1079px){
-            .main{
-                margin: 0 auto;
-                width: 100%;
-            }
-        }
-        .main {
-            position: relative;
-        }
-        .img img {
-            width: 100%;
-            background-color: black;
-            min-height: 300px;
-            max-height: 100%;
-            -webkit-backface-visibility: hidden;
-            -moz-backface-visibility: hidden;
-            backface-visibility: hidden;
-            -webkit-transform: translate3d(0, 0, 0);
-            -moz-transform: translate3d(0, 0, 0);
-            transform: translate3d(0, 0, 0);
-            -webkit-transform-style: preserve-3d;
-            -moz-transform-style: preserve-3d;
-            transform-style: preserve-3d;
-        }
-        .text {
-            position: absolute;
-            bottom: 5px;
-            border-radius: 10px;
-            background: rgba(0, 0, 0, 0.2) none repeat scroll !important;
-            width: 100%;
-        }
-
-        .content {
-            font-size: 18px;
-            word-break: break-all;
-            min-height: 100px;
-            color: #ffffff;
-            padding: 15px;
-            opacity: 1;
-            line-height: 20px;
-        }
-
-        .fin {
-            text-align: center;
-            font-size: 30px;
-            word-break: break-all;
-            min-height: 100px;
-            color: #ffffff;
-            padding: 15px;
-            opacity: 1;
-            line-height: 30px;
-        }
-        .tool{
-            position: absolute;
-        }
-    </style>
-
 </head>
 <body>
 <div class="main">
     <div class="img">
-        <img style="position: relative" id="scene" src="img/scene/s1.jpg">
+        <div id="pt" class="pt-page">
+            <img  style="width: 100%;height: 100%" id="scene" src="img/scene/s1.jpg">
+        </div>
+        <div id="pt2" class="pt-page">
+            <img  style="width: 100%;height: 100%" id="scene2" src="">
+        </div>
+
+        <div onclick="finish()" id="text" class="text">
+            <div class="content" id="content"></div>
+            <div class="toolMask">
+                <div class="tool">
+                    <a href="#" onclick="bgmSwitch()">bgm:
+                        <span id="bgm">off</span>
+                    </a>
+                    ||
+                    <a id="auto" href="#" onclick="autoPlay()">auto:
+                        <span id="autoPlay">off</span>
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
-    <div onclick="finish()" id="text" class="text">
-        <div class="content" id="content"></div>
-    </div>
-    <div class="tool">
-        bgm
-        <a href="#" onclick="document.getElementById('audio').play();return false;">开</a>
-        <a href="#" onclick="document.getElementById('audio').pause();return false;">关</a>
-        ||
-        <a href="#" onclick="autoPlay()">auto:
-           <span id="autoPlay">off</span>
-        </a>
-    </div>
+
+
 </div>
 
-<audio id="audio" style="width:350px; display: none" loop="loop" controls="controls"
+<audio id="audio" style="display: none" loop="loop" controls="controls"
        src="bgm/main.m4a"
        type="audio/mpeg"></audio>
 </body>
 </html>
-<script src="js/jquery-3.0.0.min.js"></script>
-<script src="js/sceneChange.js"></script>
-<script src="js/role_config.js"></script>
+
+
 <script src="js/main.js"></script>
 

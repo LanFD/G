@@ -1,3 +1,5 @@
+var currSceneId = '#scene';
+var nextSceneId = '#scene2';
 //当前页面移动完毕
 var endCurrPage = false;
 //后续页面移动完毕
@@ -6,6 +8,8 @@ var endNextPage = false;
 var	outClass = '';
 var inClass = '';
 
+
+
 var animEndEventNames = {
         'WebkitAnimation' : 'webkitAnimationEnd',
         'OAnimation' : 'oAnimationEnd',
@@ -13,20 +17,56 @@ var animEndEventNames = {
         'animation' : 'animationend'
     },
     // animation end event name
-    animEndEventName = animEndEventNames[ Modernizr.prefixed( 'animation' ) ];
+    animEndEventName = animEndEventNames[ Modernizr.prefixed( 'animation' ) ]
 
+$(function() {
+    //保存各个View的默认class
+    $(".pt-page").each( function() {
+        var $page = $( this );
+        $page.data( 'originalClassList', $page.attr( 'class' ) );
+    } );
+    //设置默认页面
+    $(".pt-page").eq(0).addClass( 'pt-page-current' );
 
+    //添加动画样式单选框
 
+});
+
+function changeSid(){
+    var tmp = currSceneId;
+    currSceneId = nextSceneId;
+    nextSceneId = tmp;
+}
+
+function getPageIdBySid(sid, next){
+    var res;
+    if(sid == '#scene'){
+        if(next == 1){
+            res = '#pt2'
+        }else {
+            res = '#pt'
+        }
+    }else {
+        if(next == 1){
+            res = '#pt'
+        }else {
+            res = '#pt2'
+        }
+    }
+    return res;
+}
 //View切换
-function changeView(newView){
+function changeView(){
     //设置动画效果
+    var id = '';
     var max = 67;
     var min = 1;
-    var rand = Math.floor(Math.random()*(max-min+1)+min);
+    var rand  = Math.floor(Math.random()*(max-min+1)+min);
     getAnimationClass(rand);
+    $currSid  = currSceneId;
 
-    $currPage = $(".pt-page-current").eq(0);
-    $nextPage = $(newView);
+    $currPage = $(currSceneId).parent();
+    $nextPage = $(getPageIdBySid($currSid, 1));
 
     //清除原来添加的动画，层级等样式(正常动画结束时会自动清除，这样做防止用户在动画结束前就点击切换其他的)
     $(".pt-page").each( function() {
@@ -37,7 +77,9 @@ function changeView(newView){
 
 
     //如果就是当页则不切换
-
+    if($currPage.attr("id") == $nextPage.attr("id")){
+        return;
+    }
 
     //新页面入场
     $currPage.addClass(outClass).on( animEndEventName, function() {
@@ -56,6 +98,8 @@ function changeView(newView){
             onEndAnimation( $currPage, $nextPage );
         }
     } );
+
+    changeSid();
 }
 
 //所有动画都结束后
