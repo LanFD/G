@@ -32,6 +32,11 @@ $(function() {
 
 });
 
+function changeScene(x) {
+    $(nextSceneId).attr('src', scenePath + x);
+    changeView();
+}
+
 function changeSid(){
     var tmp = currSceneId;
     currSceneId = nextSceneId;

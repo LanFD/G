@@ -40,11 +40,6 @@ function log(x) {
     console.log(x);
 }
 
-function changeScene(x) {
-    $(nextSceneId).attr('src', scenePath + x);
-    changeView();
-}
-
 function getText(cb) {
     var url = 'script/' + storyName + '/' + nowChapter + '.json';
     $.ajax({
@@ -151,8 +146,9 @@ var core = {
     beginNext: function () {
         if (auto == 1) {
             setTimeout(function () {
-                textClear();
-                sentences.charge();
+                if(textClear()){
+                    sentences.charge();
+                }
             }, nextSentenceTime);
         } else if (core.toNext == 1) {
             sentences.charge();
@@ -186,6 +182,10 @@ function start() {
 }
 
 function finish() {
+    if(auto == 1){
+        autoPlay();
+        return;
+    }
     if (end == 1 || begin == 0 || auto == 1) {
         return;
     }
@@ -202,6 +202,7 @@ function finish() {
 
 function textClear() {
     textObj.innerHTML = '';
+    return true;
 }
 
 function fin() {
@@ -213,20 +214,25 @@ function fin() {
 }
 
 function autoPlay() {
+    event.stopPropagation();
     if (auto == 0) {
         auto = 1;
+        log('toNext '+core.toNext);
         if (core.toNext == 1) {
             textClear();
+            core.toNext = 0;
             sentences.charge();
         }
+        $('#autoPlay').html('on');
+        showAuto();
     } else {
         auto = 0;
+        $('#autoPlay').html('off');
     }
-    showAuto();
 }
 
 function twinkle(x) {
-    tkl = setInterval(function () {
+    var tkl = setInterval(function () {
         if (core.toNext == 1) {
             x.fadeIn(1000).fadeOut(1000);
         } else {
@@ -237,22 +243,37 @@ function twinkle(x) {
 }
 
 function waitToClick() {
-    var c     = '<span id="waitToClick" style="color: cyan;display: none;position: absolute;bottom: 5px;right: 10px">   click</span>';
-    textObj.innerHTML += c;
-    var toTkl = $('#waitToClick');
-    twinkle(toTkl);
-
+    if($('#waitToClick').length > 0){
+        twinkle($('#waitToClick'));
+    }else {
+        var c     = '<span id="waitToClick" class="right-corner">   click</span>';
+        textObj.innerHTML += c;
+        twinkle($('#waitToClick'));
+    }
 }
 
 function showAuto() {
-    var html;
-    if (auto == 1) {
-        html = 'on';
-    } else {
-        html = 'off';
+    var id = '#showAuto';
+    if($(id).length > 0){
+
+    }else {
+        var c     = '<span id="showAuto" class="right-corner" style="color:lightpink;font-size: 20px"> Auto</span>';
+        $('.img').append(c);
+        log('ok')
     }
-    $('#autoPlay').html(html)
+
+     tkAuto = setInterval(function(){
+        if(auto == 1){
+            log('autoing');
+            $(id).fadeIn(1000).fadeOut(1000);
+        }else {
+            $(id).remove();
+            clearInterval(tkAuto );
+        }
+    }, 1000);
+
 }
+
 
 window.onload = function () {
     setTimeout(

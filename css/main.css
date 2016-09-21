@@ -2,18 +2,24 @@
     margin: 0;
     padding: 0;
 }
-a{
+
+a {
     text-decoration: none;
-    color:greenyellow;
+    color: greenyellow;
 }
-html, body{ height:100%; }
+
+html, body {
+    height: 100%;
+}
+
 .img {
-    position:relative;
+    position: relative;
     overflow: hidden;
-    top:4%;
+    top: 4%;
     height: 92%;
     width: 100%;
 }
+
 @media (min-width: 1080px) {
     .main {
         margin: 0 auto 0;
@@ -28,14 +34,16 @@ html, body{ height:100%; }
         margin: 0 auto;
         width: 100%;
     }
-    .img{
+
+    .img {
         height: 100%;
     }
 }
-.main{
+
+.main {
     display: box;
-    box-pack:center;
-    box-align:center;
+    box-pack: center;
+    box-align: center;
     position: relative;
 }
 
@@ -58,6 +66,10 @@ html, body{ height:100%; }
     transform-style: preserve-3d;
 }
 
+.pt-page img {
+    width: 100%;
+    height: 100%;
+}
 
 .text {
     position: absolute;
@@ -68,7 +80,6 @@ html, body{ height:100%; }
     width: 100%;
     z-index: 2;
 }
-
 
 .content {
     font-size: 18px;
@@ -90,13 +101,15 @@ html, body{ height:100%; }
     opacity: 1;
     line-height: 30px;
 }
-.toolMask{
+
+.toolMask {
     position: absolute;
     bottom: 0px;
     z-index: 99;
     width: 100%;
     height: 30%;
 }
+
 .tool {
     display: inline-block;
     display: none;
@@ -104,12 +117,22 @@ html, body{ height:100%; }
     bottom: 15%;
     color: white;
     padding: 0 1%;
-    //background: lightpink;
+/ / background: lightpink;
     width: 100%;
 
 }
+
 .pt-page-current,
 .no-js .pt-page {
     visibility: visible;
     z-index: 1;
+}
+
+.right-corner {
+    color: cyan;
+    display: none;
+    position: absolute;
+    bottom: 5px;
+    right: 10px;
+    z-index: 999;
 }
