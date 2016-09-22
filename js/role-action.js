@@ -1,5 +1,0 @@
-var actionName = {
-    sway:function(){
-
-    }
-};

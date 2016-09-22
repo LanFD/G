@@ -1,12 +1,13 @@
 var roles;
 var rolePath = 'role/';
 roles        = {
-    firstRole: {
-        name: 'Atia',
+    Atia: {
         path: rolePath + 'role1'
     },
-    secondRole: {
-        name: 'assassin',
+    Assassin: {
         path: rolePath + 'role2'
+    },
+    Leimu:{
+        path: rolePath + 'role3'
     }
 };

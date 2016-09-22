@@ -16,20 +16,31 @@
 <div class="main">
     <div class="img">
         <div id="pt" class="pt-page">
-            <img  id="scene" src="img/scene/s1.jpg">
+            <img id="scene" src="img/scene/s1.jpg">
         </div>
         <div id="pt2" class="pt-page">
-            <img  id="scene2" src="">
+            <img id="scene2" src="">
         </div>
-
+        <div class="roleImg r3" id="position"><img src="role/role1/default.png"></div>
+        <div class="roleImg r3" id="position2"><img src="role/role2/default.png"></div>
+        <div class="roleImg r3" id="position3"><img src="role/role3/default.png"></div>
         <div onclick="finish()" id="text" class="text">
             <div class="content" id="content"></div>
+            <div class="roleName" id="roleName">
+                <span id="name" class="roleNameShow">
+                  role
+                </span>
+            </div>
             <div class="toolMask">
                 <div class="tool">
                     <a href="#" onclick="bgmSwitch()">bgm:
                         <span id="bgm">off</span>
                     </a>
-                    ||
+                    |
+                    <a id="skip" href="#" onclick="skipPlay()">skip:
+                        <span id="skipPlay">off</span>
+                    </a>
+                    |
                     <a id="auto" href="#" onclick="autoPlay()">auto:
                         <span id="autoPlay">off</span>
                     </a>
@@ -41,7 +52,7 @@
 
 </div>
 
-<audio id="audio" style="display: none" loop="loop" controls="controls"
+<audio id="audio" style="display: none" loop="loop"
        src="bgm/main.m4a"
        type="audio/mpeg"></audio>
 </body>

@@ -3,12 +3,15 @@
     "text": "这是第一句",
     "role": [
       {
-        "id": "firstRole",
-        "pos": 0.1,
-        "status": "",
+        "name": "Atia",
+        "img":  "",
+        "showName": "AYA",
         "action": [
           {"name":"sway","delay":"3w","times":1,"sound":"pencil"}
         ]
+      },
+      {
+        "name": "assassin"
       }
     ],
     "scene":"s2.jpg"

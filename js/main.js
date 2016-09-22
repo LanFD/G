@@ -1,12 +1,13 @@
 //@author Ht  mail 382354412@qq.com
 var textObj          = document.getElementById('content');
 var nextSentenceTime = 1000; //句子间隔时间
-var wordTime         = 240;  //字间隔时间
+var wordTime         = 200;  //字间隔时间
 var nowChapter       = 1;    //第几章节
 var auto             = 0;    //是否auto play
 var begin            = 0;    //是否开始阅读
 var storyName        = 'storyname1';
 var tkl;                    //click 闪烁
+var skipping         = 0;   //是否正在快进
 var story;
 var interval;
 var end;
@@ -14,8 +15,6 @@ var scenePath        = 'img/scene/';
 var d                = new Date();
 var nowTime          = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate() + ' '
                        + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
-
-
 $(".toolMask").mouseover(function(){
     $(".tool").fadeIn(300);
 });
@@ -23,18 +22,10 @@ $(".toolMask").mouseover(function(){
 $(".toolMask").mouseleave(function(){
     $(".tool").fadeOut(300);
 });
+(function(){
+    $(".roleImg").css("bottom",$("#text").height()+'px');
+})();
 
-function bgmSwitch(){
-    var audio = $('#audio')[0];
-    event.stopPropagation();
-    if(audio.paused){
-        audio.play();
-        $('#bgm').html('on');
-    }else {
-        audio.pause();
-        $('#bgm').html('off');
-    }
-}
 
 function log(x) {
     console.log(x);
@@ -63,9 +54,15 @@ function getText(cb) {
                        fin();
                    }
                }
-
            }
     );
+}
+
+function showName(name){
+    $('#name').html(name);
+    if($('#roleName').is(":hidden")){
+        $('#roleName').show();
+    }
 }
 
 var sentences = {
@@ -113,10 +110,17 @@ var core = {
             this.arr = this.toType.split('');
         }
         this.length = this.arr.length;
+
         if (typeof (this.toType['scene']) == 'string') {
             //场景切换
             changeScene(this.toType['scene']);
         }
+
+        if (typeof (this.toType['role']) == 'object') {
+            //角色出场
+
+        }
+
         interval = setInterval(function () {
             if (typeof(core.arr[core.pos]) == 'undefined') {
                 clearInterval(interval);
@@ -182,6 +186,14 @@ function start() {
 }
 
 function finish() {
+    if(skipping == 1){
+        skipPlay();
+        return;
+    }
+    if(auto == 1){
+        autoPlay();
+        return;
+    }
     if(auto == 1){
         autoPlay();
         return;
@@ -213,22 +225,60 @@ function fin() {
     type('      F     i     n ');
 }
 
+function bgmSwitch(){
+    var audio = $('#audio')[0];
+    event.stopPropagation();
+    if(audio.paused){
+        audio.play();
+        $('#bgm').html('on');
+    }else {
+        audio.pause();
+        $('#bgm').html('off');
+    }
+}
+
 function autoPlay() {
     event.stopPropagation();
     if (auto == 0) {
         auto = 1;
-        log('toNext '+core.toNext);
         if (core.toNext == 1) {
             textClear();
             core.toNext = 0;
             sentences.charge();
         }
         $('#autoPlay').html('on');
-        showAuto();
+        showWord(' Auto', 1, 'lightpink');
     } else {
         auto = 0;
         $('#autoPlay').html('off');
     }
+}
+//快进
+function skipPlay(){
+    event.stopPropagation();
+    var rate = 10;
+
+    if(skipping == 0){
+        skipping = 1;
+        auto     = 1;
+        nextSentenceTime = nextSentenceTime/rate;
+        wordTime         = wordTime/rate;
+        if (core.toNext == 1) {
+            textClear();
+            core.toNext = 0;
+            sentences.charge();
+        }
+        $('#skipPlay').html('on');
+        showWord(' Skipping', 2, '#76EEC6');
+
+    }else {
+        skipping = 0;
+        auto     = 0;
+        nextSentenceTime = nextSentenceTime*rate;
+        wordTime         = wordTime*rate;
+        $('#skipPlay').html('off');
+    }
+
 }
 
 function twinkle(x) {
@@ -252,25 +302,21 @@ function waitToClick() {
     }
 }
 
-function showAuto() {
+function showWord(word, rate, color) {
     var id = '#showAuto';
-    if($(id).length > 0){
-
-    }else {
-        var c     = '<span id="showAuto" class="right-corner" style="color:lightpink;font-size: 20px"> Auto</span>';
+    if($(id).length <= 0){
+        var c     = '<span id="showAuto" class="right-corner" style="color:'+color+';font-size: 20px"> '+word+'</span>';
         $('.img').append(c);
-        log('ok')
     }
 
      tkAuto = setInterval(function(){
         if(auto == 1){
-            log('autoing');
-            $(id).fadeIn(1000).fadeOut(1000);
+            $(id).fadeIn(1000/rate).fadeOut(1000/rate);
         }else {
             $(id).remove();
             clearInterval(tkAuto );
         }
-    }, 1000);
+    }, 1000/rate);
 
 }
 
