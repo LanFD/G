@@ -112,17 +112,25 @@ html, body {
     width: 33.33%;
 }
 .r2{
-    width: 50%;
+    width: 45%;
 }
 .r1{
-    width: 80%;
+    width: 70%;
 }
-#position1{
-
-}#position2{
+.left_33{
     left: 33.33%;
-}#position3{
+}
+.left_66{
     left: 66.66%;
+}
+.right_4{
+    right: 4%;
+}
+.left_15{
+    left: 15%;
+}
+.left_4{
+    left: 4%;
 }
 .roleImg img{
     width: 100%;

@@ -15,15 +15,15 @@ var scenePath        = 'img/scene/';
 var d                = new Date();
 var nowTime          = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate() + ' '
                        + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
-$(".toolMask").mouseover(function(){
+$(".toolMask").mouseover(function () {
     $(".tool").fadeIn(300);
 });
 
-$(".toolMask").mouseleave(function(){
+$(".toolMask").mouseleave(function () {
     $(".tool").fadeOut(300);
 });
-(function(){
-    $(".roleImg").css("bottom",$("#text").height()+'px');
+(function () {
+    $(".roleImg").css("bottom", $("#text").height() + 'px');
 })();
 
 
@@ -34,42 +34,67 @@ function log(x) {
 function getText(cb) {
     var url = 'script/' + storyName + '/' + nowChapter + '.json';
     $.ajax({
-               type:     'get',
-               url:      url,
-               dataType: 'json',
-               //async:    false,
-               success:  function (d) {
-                   if (d) {
-                       story = d;
-                       //log(d);
-                       cb();
-                   } else {
-                       fin();
-                   }
+            type: 'get',
+            url: url,
+            dataType: 'json',
+            //async:    false,
+            success: function (d) {
+                if (d) {
+                    story = d;
+                    //log(d);
+                    cb();
+                } else {
+                    fin();
+                }
 
-               },
-               error:    function (d) {
-                   //alert(d.status);
-                   if (d.status == 404) {
-                       fin();
-                   }
-               }
-           }
+            },
+            error: function (d) {
+                //alert(d.status);
+                if (d.status == 404) {
+                    fin();
+                }
+            }
+        }
     );
 }
 
-function showName(name){
+function showName(name) {
     $('#name').html(name);
-    if($('#roleName').is(":hidden")){
+    if ($('#roleName').is(":hidden")) {
         $('#roleName').show();
     }
 }
 
+function roleControl(role, pos, isShowName){
+    var idName = role.name;
+    var rObj  = roles.getRoleByName(idName);
+    var rPath = rObj.path;
+    var rName = '';
+    var rImg  = '';
+    if (rObj) {
+        //角色存在
+
+        if (role['img']) {
+            rImg = role['img'];
+        } else {
+            rImg = rPath + 'default.png';
+        }
+        $('#position'+pos+' img').eq(0).attr('src', rImg);
+        if(isShowName){
+            if (role['showName']){
+                rName = role['showName'];
+            }else {
+                rName = role['name'];
+            }
+            showName(rName);
+        }
+    }
+}
 var sentences = {
-    pos:         0,
-    length:      0,
-    toType:      '',
-    getStory:    function () {
+    pos: 0,
+    length: 0,
+    toType: '',
+    getStory: function () {
         var cb = function () {
             sentences.getLength();
             sentences.charge();
@@ -79,10 +104,10 @@ var sentences = {
     getSentence: function () {
         this.toType = story[this.pos];
     },
-    getLength:   function () {
+    getLength: function () {
         this.length = story.length;
     },
-    charge:      function () {
+    charge: function () {
         if (this.pos < this.length) {
             this.getSentence();
             this.pos++;
@@ -97,12 +122,12 @@ var sentences = {
 };
 
 var core = {
-    arr:       [],
-    length:    0,
-    pos:       0,
-    toNext:    0,
-    toType:    '',
-    start:     function () {
+    arr: [],
+    length: 0,
+    pos: 0,
+    toNext: 0,
+    toType: '',
+    start: function () {
         //log(this.toType);
         if (typeof (this.toType['text']) == 'string') {
             this.arr = this.toType['text'].split('');
@@ -118,6 +143,27 @@ var core = {
 
         if (typeof (this.toType['role']) == 'object') {
             //角色出场
+            switch (this.toType['role'].length) {
+                case 1:
+                    $('#position').removeClass().addClass('roleImg r1 left_15');
+                    roleControl(this.toType['role'][0], '', 1);
+                    break;
+                case 2:
+                    $('#position').removeClass().addClass('roleImg r2 left_4');
+                    $('#position2').removeClass().addClass('roleImg r2 right_4');
+                    roleControl(this.toType['role'][0], '', 1);
+                    roleControl(this.toType['role'][1], '2', 0);
+                    break;
+                case 3:
+                    $('#position').removeClass().addClass('roleImg r3 ');
+                    $('#position2').removeClass().addClass('roleImg r3 left_33');
+                    $('#position3').removeClass().addClass('roleImg r3 left_66');
+                    roleControl(this.toType['role'][0], '', 1);
+                    roleControl(this.toType['role'][1], '2', 0);
+                    roleControl(this.toType['role'][2], '3', 0);
+                    break;
+            }
+
 
         }
 
@@ -135,9 +181,9 @@ var core = {
             }
 
         }, wordTime);
-       // log('i=' + interval);
+        // log('i=' + interval);
     },
-    finish:    function () {
+    finish: function () {
         clearInterval(interval);
         (function () {
             for (i = core.pos; i < core.length; i++) {
@@ -150,7 +196,7 @@ var core = {
     beginNext: function () {
         if (auto == 1) {
             setTimeout(function () {
-                if(textClear()){
+                if (textClear()) {
                     sentences.charge();
                 }
             }, nextSentenceTime);
@@ -164,7 +210,7 @@ var core = {
             }, nextSentenceTime);
         }
     },
-    ini:       function () {
+    ini: function () {
         this.arr    = [];
         this.pos    = 0;
         this.length = 0;
@@ -186,15 +232,11 @@ function start() {
 }
 
 function finish() {
-    if(skipping == 1){
+    if (skipping == 1) {
         skipPlay();
         return;
     }
-    if(auto == 1){
-        autoPlay();
-        return;
-    }
-    if(auto == 1){
+    if (auto == 1) {
         autoPlay();
         return;
     }
@@ -225,13 +267,13 @@ function fin() {
     type('      F     i     n ');
 }
 
-function bgmSwitch(){
+function bgmSwitch() {
     var audio = $('#audio')[0];
     event.stopPropagation();
-    if(audio.paused){
+    if (audio.paused) {
         audio.play();
         $('#bgm').html('on');
-    }else {
+    } else {
         audio.pause();
         $('#bgm').html('off');
     }
@@ -254,15 +296,15 @@ function autoPlay() {
     }
 }
 //快进
-function skipPlay(){
+function skipPlay() {
     event.stopPropagation();
     var rate = 10;
 
-    if(skipping == 0){
-        skipping = 1;
-        auto     = 1;
-        nextSentenceTime = nextSentenceTime/rate;
-        wordTime         = wordTime/rate;
+    if (skipping == 0) {
+        skipping         = 1;
+        auto             = 1;
+        nextSentenceTime = nextSentenceTime / rate;
+        wordTime         = wordTime / rate;
         if (core.toNext == 1) {
             textClear();
             core.toNext = 0;
@@ -271,11 +313,11 @@ function skipPlay(){
         $('#skipPlay').html('on');
         showWord(' Skipping', 2, '#76EEC6');
 
-    }else {
-        skipping = 0;
-        auto     = 0;
-        nextSentenceTime = nextSentenceTime*rate;
-        wordTime         = wordTime*rate;
+    } else {
+        skipping         = 0;
+        auto             = 0;
+        nextSentenceTime = nextSentenceTime * rate;
+        wordTime         = wordTime * rate;
         $('#skipPlay').html('off');
     }
 
@@ -293,10 +335,10 @@ function twinkle(x) {
 }
 
 function waitToClick() {
-    if($('#waitToClick').length > 0){
+    if ($('#waitToClick').length > 0) {
         twinkle($('#waitToClick'));
-    }else {
-        var c     = '<span id="waitToClick" class="right-corner">   click</span>';
+    } else {
+        var c = '<span id="waitToClick" class="right-corner">   click</span>';
         textObj.innerHTML += c;
         twinkle($('#waitToClick'));
     }
@@ -304,19 +346,19 @@ function waitToClick() {
 
 function showWord(word, rate, color) {
     var id = '#showAuto';
-    if($(id).length <= 0){
-        var c     = '<span id="showAuto" class="right-corner" style="color:'+color+';font-size: 20px"> '+word+'</span>';
+    if ($(id).length <= 0) {
+        var c = '<span id="showAuto" class="right-corner" style="color:' + color + ';font-size: 20px"> ' + word + '</span>';
         $('.img').append(c);
     }
 
-     tkAuto = setInterval(function(){
-        if(auto == 1){
-            $(id).fadeIn(1000/rate).fadeOut(1000/rate);
-        }else {
+    tkAuto = setInterval(function () {
+        if (auto == 1) {
+            $(id).fadeIn(1000 / rate).fadeOut(1000 / rate);
+        } else {
             $(id).remove();
-            clearInterval(tkAuto );
+            clearInterval(tkAuto);
         }
-    }, 1000/rate);
+    }, 1000 / rate);
 
 }
 

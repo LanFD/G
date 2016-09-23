@@ -2,12 +2,15 @@ var roles;
 var rolePath = 'role/';
 roles        = {
     Atia: {
-        path: rolePath + 'role1'
+        path: rolePath + 'role1/'
     },
     Assassin: {
-        path: rolePath + 'role2'
+        path: rolePath + 'role2/'
     },
     Leimu:{
-        path: rolePath + 'role3'
+        path: rolePath + 'role3/'
+    },
+    getRoleByName:function(x){
+        return this[x];
     }
 };
