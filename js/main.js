@@ -58,7 +58,11 @@ function getText(cb) {
     );
 }
 
-function showName(name) {
+function showName(name, hide) {
+    if(hide == 1){
+        $('#roleName').hide();
+        return;
+    }
     $('#name').html(name);
     if ($('#roleName').is(":hidden")) {
         $('#roleName').show();
@@ -67,26 +71,34 @@ function showName(name) {
 
 function roleControl(role, pos, isShowName){
     var idName = role.name;
-    var rObj  = roles.getRoleByName(idName);
+    var rObj  = roles[idName];
     var rPath = rObj.path;
     var rName = '';
     var rImg  = '';
     if (rObj) {
         //角色存在
-
         if (role['img']) {
             rImg = role['img'];
         } else {
             rImg = rPath + 'default.png';
         }
         $('#position'+pos+' img').eq(0).attr('src', rImg);
+        //$('#position'+pos+' img').eq(0).on("load",function(){
+        //    var h = $(this).height();
+        //    log(h);
+        //    log($(".img").height());
+        //    if(h > $(".img").height()*0.8){
+        //     $(this).css("height", "40%");
+        //     $(this).css("width", "auto");
+        //    }
+        //});
         if(isShowName){
             if (role['showName']){
                 rName = role['showName'];
             }else {
                 rName = role['name'];
             }
-            showName(rName);
+            showName(rName, 0);
         }
     }
 }
@@ -127,6 +139,8 @@ var core = {
     pos: 0,
     toNext: 0,
     toType: '',
+    toAct:[],
+    sound:$('#sound')[0],
     start: function () {
         //log(this.toType);
         if (typeof (this.toType['text']) == 'string') {
@@ -150,21 +164,35 @@ var core = {
                     break;
                 case 2:
                     $('#position').removeClass().addClass('roleImg r2 left_4');
-                    $('#position2').removeClass().addClass('roleImg r2 right_4');
+                    $('#position2').removeClass().addClass('roleImg r2 right_4 filter-gray');
                     roleControl(this.toType['role'][0], '', 1);
                     roleControl(this.toType['role'][1], '2', 0);
                     break;
-                case 3:
+                default:
                     $('#position').removeClass().addClass('roleImg r3 ');
-                    $('#position2').removeClass().addClass('roleImg r3 left_33');
-                    $('#position3').removeClass().addClass('roleImg r3 left_66');
+                    $('#position2').removeClass().addClass('roleImg r3 left_33 filter-gray');
+                    $('#position3').removeClass().addClass('roleImg r3 left_66 filter-gray');
                     roleControl(this.toType['role'][0], '', 1);
                     roleControl(this.toType['role'][1], '2', 0);
                     roleControl(this.toType['role'][2], '3', 0);
                     break;
             }
+            if(typeof (this.toType['role'][0]['action']) == 'object'){
+                //人物动作
+                $(this.toType['role'][0]['action']).each(function(i,e){
+                    core.toAct[e['delay'] - 1] = {"act":e['name']};
+                    if(typeof (e["sound"]) != 'undefined'){
+                        core.toAct[e['delay'] -1].sound = e["sound"];
+                    }
+                });
+                log(this.toAct);
+            }
 
-
+        }else {
+            //隐藏角色
+            showName('', 1);
+            this.toAct = {};
+            $("#roleDiv div").hide();
         }
 
         interval = setInterval(function () {
@@ -176,6 +204,16 @@ var core = {
                 }
 
             } else {
+                if(typeof (core.toAct[core.pos]) == "object"){
+
+                      //有动作
+                    $("#position").addClass("animated " + core.toAct[core.pos]['act']);
+                    if(typeof (core.toAct[core.pos]['sound']) != 'undefined'){
+                        //音效
+                        $("#sound").attr("src", "sound/"+core.toAct[core.pos]['sound']);
+                        core.sound.play();
+                    }
+                }
                 textObj.innerHTML += core.arr[core.pos];
                 core.pos++;
             }

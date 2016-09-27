@@ -1,17 +1,17 @@
 [
   {
-    "text": "这是第一句",
+    "text": "醒醒~",
     "role": [
       {
-        "name": "Atia",
+        "name": "Leimu",
         "img":  "",
-        "showName": "AYA",
+        "showName":"???",
         "action": [
-          {"name":"sway","delay":"3w","times":1,"sound":"pencil"}
+          {"name":"shake","delay":2,"sound":"pencil.wav"}
         ]
       },
       {
-        "name": "assassin"
+        "name": "Assassin"
       }
     ],
     "scene":"s2.jpg"

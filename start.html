@@ -22,16 +22,20 @@
         <div id="pt2" class="pt-page">
             <img id="scene2" src="">
         </div>
-        <div class="roleImg r3" id="position"><img src="role/role1/default.png"></div>
-        <div class="roleImg r3" id="position2"><img src="role/role2/default.png"></div>
-        <div class="roleImg r3" id="position3"><img src="role/role3/default.png"></div>
+        <div id="roleDiv">
+            <div class="roleImg r3" id="position"><img></div>
+            <div class="roleImg r3" id="position2"><img></div>
+            <div class="roleImg r3" id="position3"><img></div>
+        </div>
         <div onclick="finish()" id="text" class="text">
             <div class="content" id="content"></div>
             <div class="roleName" id="roleName">
-                <span id="name" class="roleNameShow">
-                  role
-                </span>
+                <div id="name" class="roleNameShow">
+                    role
+                </div>
             </div>
+
+
             <div class="toolMask">
                 <div class="tool">
                     <a href="#" onclick="bgmSwitch()">bgm:
@@ -56,6 +60,7 @@
 <audio id="audio" style="display: none" loop="loop"
        src="bgm/main.m4a"
        type="audio/mpeg"></audio>
+<audio id="sound" style="display: none" type ="audio/mpeg"></audio>
 </body>
 </html>
 
