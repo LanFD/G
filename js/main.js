@@ -1,7 +1,7 @@
 //@author Ht  mail 382354412@qq.com
 var textObj          = document.getElementById('content');
 var nextSentenceTime = 1000; //句子间隔时间
-var wordTime         = 200;  //字间隔时间
+var wordTime         = 120;  //字间隔时间
 var nowChapter       = 1;    //第几章节
 var auto             = 0;    //是否auto play
 var begin            = 0;    //是否开始阅读
@@ -69,11 +69,11 @@ function showName(name, hide) {
     }
 }
 
-function roleControl(role, pos, isShowName){
+function roleControl(role, pos, isshowName){
+    log(role);
     var idName = role.name;
     var rObj  = roles[idName];
     var rPath = rObj.path;
-    var rName = '';
     var rImg  = '';
     if (rObj) {
         //角色存在
@@ -83,23 +83,12 @@ function roleControl(role, pos, isShowName){
             rImg = rPath + 'default.png';
         }
         $('#position'+pos+' img').eq(0).attr('src', rImg);
-        //$('#position'+pos+' img').eq(0).on("load",function(){
-        //    var h = $(this).height();
-        //    log(h);
-        //    log($(".img").height());
-        //    if(h > $(".img").height()*0.8){
-        //     $(this).css("height", "40%");
-        //     $(this).css("width", "auto");
-        //    }
-        //});
-        if(isShowName){
-            if (role['showName']){
-                rName = role['showName'];
-            }else {
-                rName = role['name'];
-            }
-            showName(rName, 0);
+        if(isshowName){
+             if(core.showName == ''){
+                  showName(role.name, 0);
+             }
         }
+
     }
 }
 var sentences = {
@@ -126,7 +115,6 @@ var sentences = {
             type(this.toType);
         } else {
             this.pos = 0;
-            // alert('now:'+nowChapter);
             nowChapter++;
             this.getStory();
         }
@@ -140,6 +128,7 @@ var core = {
     toNext: 0,
     toType: '',
     toAct:[],
+    showName:'',
     sound:$('#sound')[0],
     start: function () {
         //log(this.toType);
@@ -154,6 +143,24 @@ var core = {
             //场景切换
             changeScene(this.toType['scene']);
         }
+        if (typeof (this.toType['hideRole']) == 'number') {
+            //隐藏角色
+            $("#roleDiv div").hide();
+        }
+
+        if (typeof (this.toType['showName']) == 'string') {
+            //显示名称
+            this.showName = this.toType['showName'];
+            if(this.showName){
+                showName(this.showName, 0);
+            }else {
+                showName(this.showName, 1);
+            }
+        }else {
+            this.showName = '';
+        }
+
+
 
         if (typeof (this.toType['role']) == 'object') {
             //角色出场
@@ -185,14 +192,12 @@ var core = {
                         core.toAct[e['delay'] -1].sound = e["sound"];
                     }
                 });
-                log(this.toAct);
             }
+            $("#roleDiv div").show();
+
 
         }else {
-            //隐藏角色
-            showName('', 1);
             this.toAct = {};
-            $("#roleDiv div").hide();
         }
 
         interval = setInterval(function () {

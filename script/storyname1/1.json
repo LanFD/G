@@ -1,33 +1,64 @@
 [
   {
     "text": "醒醒~",
+    "showName": "???",
     "role": [
       {
-        "name": "Leimu",
-        "img":  "",
-        "showName":"???",
+        "name": "Reimu",
+        "img": "",
         "action": [
-          {"name":"shake","delay":2,"sound":"pencil.wav"}
+          {
+            "name": "shake",
+            "delay": 2,
+            "sound": "pencil.wav"
+          }
         ]
-      },
-      {
-        "name": "Assassin"
       }
-    ],
-    "scene":"s2.jpg"
+    ]
   },
   {
-    "text": "这是第2句",
-    "scene":"s3.jpg"
+    "showName": "我",
+    "text": "吓？你是谁，我在哪里，我在做什么，我的钱都去哪了？"
   },
   {
-    "text": "这是第3句"
+    "text": "我是Reimu呀，客官刚刚不是塞了10w钱么····所以····",
+    "role": [
+      {
+        "name": "Reimu",
+        "action": [
+          {
+            "name": "flipInY",
+            "delay": 1
+          }
+        ]
+      }
+    ]
   },
   {
-    "text": "这是第4句"
+    "showName":"我",
+    "text": "（10w？我什么时候有过这么多钱,嘛，但是现在重要的是，‘所以’后面是什么也，好在意···）",
+    "scene": "s1.jpg",
+    "hideRole":1
   },
   {
-    "text": "这是第5句"
+    "scene":"s1.jpg",
+    "showName":"我",
+    "text":"咳咳····所···所以···什么呢··",
+    "role": [
+      {
+        "name": "Reimu",
+        "action": [
+          {
+            "name": "flipInX",
+            "delay": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "text": "程序猿偷懒没写下去啦····",
+    "showName":""
   },
   "这是第6句"
 ]

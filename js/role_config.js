@@ -7,7 +7,7 @@ roles        = {
     "Assassin":
         {"path":rolePath + 'role2/'}
     ,
-    "Leimu":
+    "Reimu":
         {"path":rolePath + 'role3/'}
 
 };
