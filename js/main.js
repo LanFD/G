@@ -32,11 +32,12 @@ function log(x) {
 }
 
 function getText(cb) {
-    var url = 'script/' + storyName + '/' + nowChapter + '.json';
+    var url = 'script/' + storyName + '/' + nowChapter + '.js';
     $.ajax({
             type: 'get',
             url: url,
-            dataType: 'json',
+            dataType: 'JSONP',
+            jsonp: "jsonpcallback",
             //async:    false,
             success: function (d) {
                 if (d) {
@@ -70,7 +71,6 @@ function showName(name, hide) {
 }
 
 function roleControl(role, pos, isshowName){
-    log(role);
     var idName = role.name;
     var rObj  = roles[idName];
     var rPath = rObj.path;
@@ -138,11 +138,19 @@ var core = {
             this.arr = this.toType.split('');
         }
         this.length = this.arr.length;
-
+        log(this.toType);
         if (typeof (this.toType['scene']) == 'string') {
             //场景切换
+            log(1);
             changeScene(this.toType['scene']);
         }
+        if (typeof (this.toType['bgm']) == 'string') {
+            //bgm切换
+            $('#audio')[0].pause();
+            $('#audio').attr("src", "bgm/"+this.toType['bgm']);
+            $('#audio')[0].play();
+        }
+
         if (typeof (this.toType['hideRole']) == 'number') {
             //隐藏角色
             $("#roleDiv div").hide();
@@ -210,8 +218,8 @@ var core = {
 
             } else {
                 if(typeof (core.toAct[core.pos]) == "object"){
-
                       //有动作
+                    $("#position").attr("class", $("#position").attr("class").replace(/^animated.+/, ''));
                     $("#position").addClass("animated " + core.toAct[core.pos]['act']);
                     if(typeof (core.toAct[core.pos]['sound']) != 'undefined'){
                         //音效
@@ -270,8 +278,13 @@ function type(toType) {
 }
 
 function start() {
-    begin = 1;
-    sentences.getStory();
+    $("#canvas").remove();
+    $("#start-scene").remove();
+    $("#text").fadeIn(1000);
+    setTimeout(function(){
+        begin = 1;
+        sentences.getStory();
+    }, 1000);
 }
 
 function finish() {
@@ -406,10 +419,10 @@ function showWord(word, rate, color) {
 }
 
 
-window.onload = function () {
-    setTimeout(
-        function () {
-            start()
-        }, 1000);
-};
+//window.onload = function () {
+//    setTimeout(
+//        function () {
+//            start()
+//        }, 1000);
+//};
 

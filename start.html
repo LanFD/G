@@ -4,6 +4,9 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <meta name="full-screen" content="yes">
+    <meta HTTP-EQUIV="pragma" CONTENT="no-cache">
+    <meta HTTP-EQUIV="Cache-Control" CONTENT="no-cache, must-revalidate">
+    <meta HTTP-EQUIV="expires" CONTENT="0">
     <link href="css/main.css" rel="stylesheet">
     <link href="css/animate.min.css" rel="stylesheet">
     <link href="css/sceneChange.css" rel="stylesheet">
@@ -16,8 +19,16 @@
 <body>
 <div class="main">
     <div class="img">
-        <div id="pt" class="pt-page">
-            <img id="scene" src="img/scene/s1.jpg">
+        <canvas id="canvas"></canvas>
+        <div id="start-scene">
+            <h1>This is a demo story</h1>
+            <br/>
+            <h1 onclick="start()">START</h1>
+            <br/>
+            <h1>LOAD</h1>
+        </div>
+        <div id="pt" class="pt-page" style="z-index:-1;">
+            <img id="scene" src="img/scene/start2.jpg">
         </div>
         <div id="pt2" class="pt-page">
             <img id="scene2" src="">
@@ -58,12 +69,11 @@
 </div>
 
 <audio id="audio" style="display: none" loop="loop" autoplay
-       src="bgm/main.m4a"
+       src="bgm/ying.mp3"
        type="audio/mpeg"></audio>
 <audio id="sound" style="display: none" type ="audio/mpeg"></audio>
 </body>
 </html>
 
-
-<script src="js/main.js"></script>
-
+<script type="text/javascript" src="js/main.js"></script>
+<script type="text/javascript" src="js/start.canvas.js"></script>
