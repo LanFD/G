@@ -8,6 +8,7 @@ var begin            = 0;    //是否开始阅读
 var storyName        = 'storyname1';
 var tkl;                    //click 闪烁
 var skipping         = 0;   //是否正在快进
+var doScript         = 0;   //读取的剧本
 var story;
 var interval;
 var end;
@@ -30,37 +31,83 @@ $(".toolMask").mouseleave(function () {
 function log(x) {
     console.log(x);
 }
+function nowTimeStamp(){
+    return Date.parse(new Date());
+}
+
+function reloadAbleJSFn(id,newJS)
+{
+
+    var oldjs = document.getElementById(id);
+    if(oldjs) oldjs.parentNode.removeChild(oldjs);
+    var scriptObj = document.createElement("script");
+    scriptObj.src = newJS;
+    scriptObj.type = "text/javascript";
+    scriptObj.id   = id;
+    document.getElementsByTagName("head")[0].appendChild(scriptObj);
+}
+
+function getScript(cb, t) {
+    if(!t){
+        t = 1;
+    }
+    $(document).ready(function() {
+        if(typeof doScript != 'object'){
+            if(t > 5){
+                fin();
+            }else {
+                setTimeout(getScript(cb, ++t), 1000);
+            }
+        }else {
+            cb();
+        }
+
+    });
+}
 
 function getText(cb) {
-    var url = 'script/' + storyName + '/' + nowChapter + '.js';
-    $.ajax({
-            type: 'get',
-            url: url,
-            dataType: 'JSONP',
-            jsonp: "jsonpcallback",
-            //async:    false,
-            success: function (d) {
-                if (d) {
-                    story = d;
-                    //log(d);
-                    cb();
-                } else {
-                    fin();
-                }
+    var url = 'script/' + storyName + '/' + nowChapter + '.js?';
+    //$.ajax({
+    //        type: 'get',
+    //        url: url,
+    //        dataType: 'JSONP',
+    //        jsonp: "callback",
+    //        jsonpCallback:"doScript",
+    //        //async:    false,
+    //        success: function (d) {
+    //            if (d) {
+    //                story = d;
+    //                //log(d);
+    //                cb();
+    //            } else {
+    //                fin();
+    //            }
+    //
+    //        },
+    //        error: function (d) {
+    //            //alert(d.status);
+    //            if (d.status == 404) {
+    //                fin();
+    //            }
+    //        }
+    //    }
+    //);
+    //http方式访问剧本
 
-            },
-            error: function (d) {
-                //alert(d.status);
-                if (d.status == 404) {
-                    fin();
-                }
-            }
-        }
-    );
+    reloadAbleJSFn('script', url);
+
+    //以script src方式访问，解决跨域
+    //$('#script').attr("src", url);
+    getScript(function () {
+            story = doScript;
+            //log(d);
+            cb();
+    }, 0);
+
 }
 
 function showName(name, hide) {
-    if(hide == 1){
+    if (hide == 1) {
         $('#roleName').hide();
         return;
     }
@@ -70,11 +117,11 @@ function showName(name, hide) {
     }
 }
 
-function roleControl(role, pos, isshowName){
+function roleControl(role, pos, isshowName) {
     var idName = role.name;
-    var rObj  = roles[idName];
-    var rPath = rObj.path;
-    var rImg  = '';
+    var rObj   = roles[idName];
+    var rPath  = rObj.path;
+    var rImg   = '';
     if (rObj) {
         //角色存在
         if (role['img']) {
@@ -82,11 +129,11 @@ function roleControl(role, pos, isshowName){
         } else {
             rImg = rPath + 'default.png';
         }
-        $('#position'+pos+' img').eq(0).attr('src', rImg);
-        if(isshowName){
-             if(core.showName == ''){
-                  showName(role.name, 0);
-             }
+        $('#position' + pos + ' img').eq(0).attr('src', rImg);
+        if (isshowName) {
+            if (core.showName == '') {
+                showName(role.name, 0);
+            }
         }
 
     }
@@ -127,9 +174,9 @@ var core = {
     pos: 0,
     toNext: 0,
     toType: '',
-    toAct:[],
-    showName:'',
-    sound:$('#sound')[0],
+    toAct: [],
+    showName: '',
+    sound: $('#sound')[0],
     start: function () {
         //log(this.toType);
         if (typeof (this.toType['text']) == 'string') {
@@ -138,16 +185,14 @@ var core = {
             this.arr = this.toType.split('');
         }
         this.length = this.arr.length;
-        log(this.toType);
         if (typeof (this.toType['scene']) == 'string') {
             //场景切换
-            log(1);
             changeScene(this.toType['scene']);
         }
         if (typeof (this.toType['bgm']) == 'string') {
             //bgm切换
             $('#audio')[0].pause();
-            $('#audio').attr("src", "bgm/"+this.toType['bgm']);
+            $('#audio').attr("src", "bgm/" + this.toType['bgm']);
             $('#audio')[0].play();
         }
 
@@ -159,15 +204,14 @@ var core = {
         if (typeof (this.toType['showName']) == 'string') {
             //显示名称
             this.showName = this.toType['showName'];
-            if(this.showName){
+            if (this.showName) {
                 showName(this.showName, 0);
-            }else {
+            } else {
                 showName(this.showName, 1);
             }
-        }else {
+        } else {
             this.showName = '';
         }
-
 
 
         if (typeof (this.toType['role']) == 'object') {
@@ -192,19 +236,19 @@ var core = {
                     roleControl(this.toType['role'][2], '3', 0);
                     break;
             }
-            if(typeof (this.toType['role'][0]['action']) == 'object'){
+            if (typeof (this.toType['role'][0]['action']) == 'object') {
                 //人物动作
-                $(this.toType['role'][0]['action']).each(function(i,e){
-                    core.toAct[e['delay'] - 1] = {"act":e['name']};
-                    if(typeof (e["sound"]) != 'undefined'){
-                        core.toAct[e['delay'] -1].sound = e["sound"];
+                $(this.toType['role'][0]['action']).each(function (i, e) {
+                    core.toAct[e['delay'] - 1] = {"act": e['name']};
+                    if (typeof (e["sound"]) != 'undefined') {
+                        core.toAct[e['delay'] - 1].sound = e["sound"];
                     }
                 });
             }
             $("#roleDiv div").show();
 
 
-        }else {
+        } else {
             this.toAct = {};
         }
 
@@ -217,13 +261,13 @@ var core = {
                 }
 
             } else {
-                if(typeof (core.toAct[core.pos]) == "object"){
-                      //有动作
+                if (typeof (core.toAct[core.pos]) == "object") {
+                    //有动作
                     $("#position").attr("class", $("#position").attr("class").replace(/^animated.+/, ''));
                     $("#position").addClass("animated " + core.toAct[core.pos]['act']);
-                    if(typeof (core.toAct[core.pos]['sound']) != 'undefined'){
+                    if (typeof (core.toAct[core.pos]['sound']) != 'undefined') {
                         //音效
-                        $("#sound").attr("src", "sound/"+core.toAct[core.pos]['sound']);
+                        $("#sound").attr("src", "sound/" + core.toAct[core.pos]['sound']);
                         core.sound.play();
                     }
                 }
@@ -281,7 +325,7 @@ function start() {
     $("#canvas").remove();
     $("#start-scene").remove();
     $("#text").fadeIn(1000);
-    setTimeout(function(){
+    setTimeout(function () {
         begin = 1;
         sentences.getStory();
     }, 1000);
