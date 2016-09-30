@@ -21,9 +21,13 @@
     <div class="img">
         <canvas id="canvas"></canvas>
         <div id="start-scene">
-            <h1>This is a demo story</h1>
+            <h1 class="animated bounceInRight">This is a demo story</h1>
             <br/>
-            <h1 onclick="start()">》START</h1>
+            <h1 id="startButton" class="animated rotateInUpLeft">
+                <span onclick="start()">
+                    》START
+                </span>
+            </h1>
             <br/>
         </div>
         <div id="pt" class="pt-page" style="z-index:-1;">
@@ -44,8 +48,6 @@
                     role
                 </div>
             </div>
-
-
             <div class="toolMask">
                 <div class="tool">
                     <a href="#" onclick="bgmSwitch()">bgm:
@@ -63,8 +65,6 @@
             </div>
         </div>
     </div>
-
-
 </div>
 
 <audio id="audio" style="display: none" loop="loop" autoplay
@@ -73,7 +73,6 @@
 <audio id="sound" style="display: none" type ="audio/mpeg"></audio>
 </body>
 </html>
-<script type="text/javascript" id="script"></script>
 <script type="text/javascript" src="js/main.js"></script>
 <script type="text/javascript" src="js/start.canvas.js"></script>
 

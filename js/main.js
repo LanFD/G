@@ -9,6 +9,7 @@ var storyName        = 'storyname1';
 var tkl;                    //click 闪烁
 var skipping         = 0;   //是否正在快进
 var doScript         = 0;   //读取的剧本
+var intS             ;      //start按钮动画
 var story;
 var interval;
 var end;
@@ -17,16 +18,52 @@ var d                = new Date();
 var nowTime          = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate() + ' '
                        + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
 $(".toolMask").mouseover(function () {
+    $(".tool").stop();
     $(".tool").fadeIn(300);
 });
-
 $(".toolMask").mouseleave(function () {
+    $(".tool").stop();
     $(".tool").fadeOut(300);
 });
+
+$("#startButton span").mouseover(function () {
+    clearInterval(intS);
+    aniCls('#startButton', 'pulse infinite');
+});
+
+$("#startButton span").mouseleave(function () {
+    aniStartButton();
+});
+
 (function () {
     $(".roleImg").css("bottom", $("#text").height() + 'px');
+    aniStartButton();
 })();
 
+function aniStartButton(){
+    var aniArr = [
+        'bounce',
+        'flash',
+        'rubberBand',
+        'shake',
+        'swing',
+        'tada',
+        'wobble',
+        'bounceIn'
+    ];
+    intS = setInterval(function(){
+        aniCls('#startButton', aniArr[getRandNum(0, aniArr.length)])
+    }, 2000);
+}
+
+function aniCls(e, c){
+    $(e).attr("class", $(e).attr("class").replace(/^animated.+/, ''));
+    $(e).addClass("animated " + c);
+}
+
+function getRandNum(min, max){
+   return Math.floor(Math.random()*(max-min+1)+min)
+}
 
 function log(x) {
     console.log(x);
@@ -37,14 +74,13 @@ function nowTimeStamp(){
 
 function reloadAbleJSFn(id,newJS)
 {
-
     var oldjs = document.getElementById(id);
     if(oldjs) oldjs.parentNode.removeChild(oldjs);
     var scriptObj = document.createElement("script");
     scriptObj.src = newJS;
     scriptObj.type = "text/javascript";
     scriptObj.id   = id;
-    document.getElementsByTagName("head")[0].appendChild(scriptObj);
+    document.getElementsByTagName("head")[0].appendChild(scriptObj)
 }
 
 function getScript(cb, t) {
@@ -59,7 +95,11 @@ function getScript(cb, t) {
                 setTimeout(getScript(cb, ++t), 1000);
             }
         }else {
-            cb();
+            if(story == doScript){
+                fin();
+            }else {
+                cb();
+            }
         }
 
     });
@@ -263,8 +303,7 @@ var core = {
             } else {
                 if (typeof (core.toAct[core.pos]) == "object") {
                     //有动作
-                    $("#position").attr("class", $("#position").attr("class").replace(/^animated.+/, ''));
-                    $("#position").addClass("animated " + core.toAct[core.pos]['act']);
+                    aniCls('#position', core.toAct[core.pos]['act']);
                     if (typeof (core.toAct[core.pos]['sound']) != 'undefined') {
                         //音效
                         $("#sound").attr("src", "sound/" + core.toAct[core.pos]['sound']);
@@ -325,6 +364,7 @@ function start() {
     $("#canvas").remove();
     $("#start-scene").remove();
     $("#text").fadeIn(1000);
+    clearInterval(intS);
     setTimeout(function () {
         begin = 1;
         sentences.getStory();
@@ -360,6 +400,7 @@ function textClear() {
 }
 
 function fin() {
+    showName('', 1);
     textClear();
     auto              = 0;
     end               = 1;
@@ -450,7 +491,6 @@ function showWord(word, rate, color) {
         var c = '<span id="showAuto" class="right-corner" style="color:' + color + ';font-size: 20px"> ' + word + '</span>';
         $('.img').append(c);
     }
-
     tkAuto = setInterval(function () {
         if (auto == 1) {
             $(id).fadeIn(1000 / rate).fadeOut(1000 / rate);

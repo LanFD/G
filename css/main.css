@@ -44,6 +44,9 @@ html, body {
     height: 100%;
     z-index: 999;
 }
+#startButton{
+    cursor:pointer;
+}
 
 .main {
     display: box;
