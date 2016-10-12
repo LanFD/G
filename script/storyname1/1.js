@@ -1,4 +1,4 @@
-    doScript = [
+ doScript = [
         {
             "text": "醒醒~,再不起来我打你啊！hey ya ~~~",
             "scene": "s1.jpg",

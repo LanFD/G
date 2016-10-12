@@ -9,7 +9,7 @@ var storyName        = 'storyname1';
 var tkl;                    //click 闪烁
 var skipping         = 0;   //是否正在快进
 var doScript         = 0;   //读取的剧本
-var intS             ;      //start按钮动画
+var intS;                   //start按钮动画
 var story;
 var interval;
 var end;
@@ -32,6 +32,7 @@ $("#startButton span").mouseover(function () {
 });
 
 $("#startButton span").mouseleave(function () {
+    $("#startButton").removeClass();
     aniStartButton();
 });
 
@@ -80,7 +81,7 @@ function reloadAbleJSFn(id,newJS)
     scriptObj.src = newJS;
     scriptObj.type = "text/javascript";
     scriptObj.id   = id;
-    document.getElementsByTagName("head")[0].appendChild(scriptObj)
+    document.getElementsByTagName("head")[0].appendChild(scriptObj);
 }
 
 function getScript(cb, t) {
@@ -95,18 +96,21 @@ function getScript(cb, t) {
                 setTimeout(getScript(cb, ++t), 1000);
             }
         }else {
-            if(story == doScript){
-                fin();
-            }else {
-                cb();
-            }
+            //解决有服务器环境时新剧本不加载的问题
+            setTimeout(function(){
+                if(story === doScript){
+                    fin();
+                }else {
+                    cb();
+                }
+            },170);
         }
 
     });
 }
 
 function getText(cb) {
-    var url = 'script/' + storyName + '/' + nowChapter + '.js?';
+    var url = 'script/' + storyName + '/' + nowChapter + '.js';
     //$.ajax({
     //        type: 'get',
     //        url: url,
@@ -132,7 +136,7 @@ function getText(cb) {
     //        }
     //    }
     //);
-    //http方式访问剧本
+    //ajax方式访问剧本
 
     reloadAbleJSFn('script', url);
 

@@ -1,4 +1,4 @@
-    doScript = [
+doScript = [
         {
             "showName": "我 大吃一惊",
             "text": "啊啊 那个黑影是什么？？",
