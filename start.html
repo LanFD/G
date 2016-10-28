@@ -14,6 +14,90 @@
     <title>Ht Works</title>
 </head>
 <body>
+<div id="mask" class="mask" style=""></div>
+<div id="loadUI" class="loadUI" style="">
+    <div class="savesControl">
+        <div class="savesControlInfo">选择存档</div>
+        <img id="closeLoadUI" class="func_closeButton parent2" style="position: absolute;top:-100%;height: 200%" src="img/button/close.png">
+    </div>
+    <div class="savesOuter">
+        <div class="savesZone">
+            <div class="saves">
+                <div class="inner">
+                    <div class="imgBox"><img src="img/scene/s1.jpg"></div>
+                    <div class="innerMsg">存档1  2016-9-9 16:09:09</div>
+                </div>
+            </div>
+            <div class="saves">
+                <div class="inner">
+                    <div class="imgBox"><img src="img/scene/s1.jpg"></div>
+                    <div class="innerMsg">存档1  2016-9-9 16:09:09</div>
+                </div>
+            </div>
+            <div class="saves">
+                <div class="inner">
+                    <div class="imgBox"><img src="img/scene/s1.jpg"></div>
+                    <div class="innerMsg">存档1  2016-9-9 16:09:09</div>
+                </div>
+            </div>
+            <div class="saves">
+                <div class="inner">
+                    <div class="imgBox"><img src="img/scene/s1.jpg"></div>
+                    <div class="innerMsg">存档1  2016-9-9 16:09:09</div>
+                </div>
+            </div>
+            <div class="saves">
+                <div class="inner">
+                    <div class="imgBox"><img src="img/scene/s1.jpg"></div>
+                    <div class="innerMsg">存档1  2016-9-9 16:09:09</div>
+                </div>
+            </div>
+            <div class="saves">
+                <div class="inner">
+                    <div class="imgBox"><img src="img/scene/s1.jpg"></div>
+                    <div class="innerMsg">存档1  2016-9-9 16:09:09</div>
+                </div>
+            </div>
+            <div class="saves">
+                <div class="inner">
+                    <div class="imgBox"><img src="img/scene/s1.jpg"></div>
+                    <div class="innerMsg">存档1  2016-9-9 16:09:09</div>
+                </div>
+            </div><div class="saves">
+            <div class="inner">
+                <div class="imgBox"><img src="img/scene/s1.jpg"></div>
+                <div class="innerMsg">存档1  2016-9-9 16:09:09</div>
+            </div>
+        </div>
+
+            <div class="saves">
+                <div class="inner">
+                    <div class="imgBox"><img src="img/scene/s1.jpg"></div>
+                    <div class="innerMsg">存档1  2016-9-9 16:09:09</div>
+                </div>
+            </div>
+            <div class="saves">
+                <div class="inner">
+                    <div class="imgBox"><img src="img/scene/s1.jpg"></div>
+                    <div class="innerMsg">存档1  2016-9-9 16:09:09</div>
+                </div>
+            </div>
+            <div class="saves">
+                <div class="inner">
+                    <div class="imgBox"><img src="img/scene/s1.jpg"></div>
+                    <div class="innerMsg">存档1  2016-9-9 16:09:09</div>
+                </div>
+            </div>
+            <div class="saves" id="newSave">
+                <div class="inner">
+                    <div class="imgBox"><img src="img/button/plus.png"></div>
+                    <div class="innerMsg">新存档位</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
 <div class="main">
     <div class="img">
         <canvas id="canvas"></canvas>
@@ -26,6 +110,11 @@
                 </span>
             </h1>
             <br/>
+            <h1 id="loadButton" class="animated rollIn">
+                <span onclick="openLoadPage()">
+                    》load
+                </span>
+            </h1>
         </div>
         <div id="pt" class="pt-page" style="z-index:-1;">
             <img id="scene" src="img/scene/start2.jpg">
@@ -34,9 +123,9 @@
             <img id="scene2" src="">
         </div>
         <div id="roleDiv">
-            <div class="roleImg r3" id="position"><img></div>
-            <div class="roleImg r3" id="position2"><img></div>
-            <div class="roleImg r3" id="position3"><img></div>
+            <div class="roleImg r3" id="position"><img /></div>
+            <div class="roleImg r3" id="position2"><img /></div>
+            <div class="roleImg r3" id="position3"><img /></div>
         </div>
         <div onclick="finish()" id="text" class="text">
             <div class="content" id="content"></div>
@@ -58,18 +147,25 @@
                     <a id="auto" href="#" onclick="autoPlay()">auto:
                         <span id="autoPlay">off</span>
                     </a>
+                    |
+                    <a id="save" href="#" onclick="">
+                        save
+                    </a>
+                    |
+                    <a id="load" href="#" onclick="openLoadPage()">
+                       load
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<audio id="audio" style="display: none" loop="loop" autoplay
-       src="bgm/ying.mp3"
-       type="audio/mpeg"></audio>
-<audio id="sound" style="display: none" type ="audio/mpeg"></audio>
+<audio id="audio" style="display: none" loop="loop" autoplay src="bgm/ying.mp3"></audio>
+<audio id="sound" style="display: none"></audio>
 </body>
 </html>
+<script type="text/javascript" src="js/style.js"></script>
 <script type="text/javascript" src="js/main.js"></script>
 <script type="text/javascript" src="js/start.canvas.js"></script>
 

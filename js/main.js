@@ -1,189 +1,69 @@
 //@author Ht  mail 382354412@qq.com
-var textObj          = document.getElementById('content');
 var nextSentenceTime = 1000; //句子间隔时间
-var wordTime         = 120;  //字间隔时间
-var nowChapter       = 1;    //第几章节
-var auto             = 0;    //是否auto play
-var begin            = 0;    //是否开始阅读
-var storyName        = 'storyname1';
+var wordTime         = 100;  //字间隔时间
+
+var textObj     = document.getElementById('content');
+var nowChapter  = 1;    //第几章节
+var nowSentence = 0;    //第几句
+var auto        = 0;    //是否auto play
+var begin       = 0;    //是否开始阅读
+var storyName   = 'storyname1';
 var tkl;                    //click 闪烁
-var skipping         = 0;   //是否正在快进
-var doScript         = 0;   //读取的剧本
-var intS;                   //start按钮动画
+var skipping    = 0;   //是否正在快进
+var doScript    = 0;   //读取的剧本
 var story;
 var interval;
 var end;
-var scenePath        = 'img/scene/';
-var d                = new Date();
-var nowTime          = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate() + ' '
-                       + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
-$(".toolMask").mouseover(function () {
-    $(".tool").stop();
-    $(".tool").fadeIn(300);
-});
-$(".toolMask").mouseleave(function () {
-    $(".tool").stop();
-    $(".tool").fadeOut(300);
-});
-
-$("#startButton span").mouseover(function () {
-    clearInterval(intS);
-    aniCls('#startButton', 'pulse infinite');
-});
-
-$("#startButton span").mouseleave(function () {
-    $("#startButton").removeClass();
-    aniStartButton();
-});
-
-(function () {
-    $(".roleImg").css("bottom", $("#text").height() + 'px');
-    aniStartButton();
-})();
-
-function aniStartButton(){
-    var aniArr = [
-        'bounce',
-        'flash',
-        'rubberBand',
-        'shake',
-        'swing',
-        'tada',
-        'wobble',
-        'bounceIn'
-    ];
-    intS = setInterval(function(){
-        aniCls('#startButton', aniArr[getRandNum(0, aniArr.length)])
-    }, 2000);
-}
-
-function aniCls(e, c){
-    $(e).attr("class", $(e).attr("class").replace(/^animated.+/, ''));
-    $(e).addClass("animated " + c);
-}
-
-function getRandNum(min, max){
-   return Math.floor(Math.random()*(max-min+1)+min)
-}
-
-function log(x) {
-    console.log(x);
-}
-function nowTimeStamp(){
-    return Date.parse(new Date());
-}
-
-function reloadAbleJSFn(id,newJS)
-{
-    var oldjs = document.getElementById(id);
-    if(oldjs) oldjs.parentNode.removeChild(oldjs);
-    var scriptObj = document.createElement("script");
-    scriptObj.src = newJS;
-    scriptObj.type = "text/javascript";
-    scriptObj.id   = id;
-    document.getElementsByTagName("head")[0].appendChild(scriptObj);
-}
-
-function getScript(cb, t) {
-    if(!t){
-        t = 1;
+var scenePath   = 'img/scene/';
+var saves       = window.localStorage;
+var canSave     = 0;
+//清除存档
+saves.clear();
+if (saves) {
+    canSave = 1;
+    if (typeof saves.saves == 'undefined') {
+        //初始化
+        saves.saves = arrToJson(['init']);
+        log(saves);
     }
-    $(document).ready(function() {
-        if(typeof doScript != 'object'){
-            if(t > 5){
-                fin();
-            }else {
-                setTimeout(getScript(cb, ++t), 1000);
-            }
-        }else {
-            //解决有服务器环境时新剧本不加载的问题
-            setTimeout(function(){
-                if(story === doScript){
-                    fin();
-                }else {
-                    cb();
-                }
-            },170);
-        }
-
-    });
+} else {
+    alert('此浏览器不支持localStorage，存档功能将无法使用');
 }
 
-function getText(cb) {
-    var url = 'script/' + storyName + '/' + nowChapter + '.js';
-    //$.ajax({
-    //        type: 'get',
-    //        url: url,
-    //        dataType: 'JSONP',
-    //        jsonp: "callback",
-    //        jsonpCallback:"doScript",
-    //        //async:    false,
-    //        success: function (d) {
-    //            if (d) {
-    //                story = d;
-    //                //log(d);
-    //                cb();
-    //            } else {
-    //                fin();
-    //            }
-    //
-    //        },
-    //        error: function (d) {
-    //            //alert(d.status);
-    //            if (d.status == 404) {
-    //                fin();
-    //            }
-    //        }
-    //    }
-    //);
-    //ajax方式访问剧本
-
-    reloadAbleJSFn('script', url);
-
-    //以script src方式访问，解决跨域
-    //$('#script').attr("src", url);
-    getScript(function () {
-            story = doScript;
-            //log(d);
-            cb();
-    }, 0);
-
+function getDate() {
+    var d = new Date();
+    return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate() + ' '
+           + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
 }
 
-function showName(name, hide) {
-    if (hide == 1) {
-        $('#roleName').hide();
-        return;
+/*
+ 本地存档
+ @param info 存档信息
+ @param key  档位
+ @return void
+ */
+function saveGame(info, key) {
+    var d = jsonToArr(saves.saves);
+    var l = d.length;
+    if (key == '') {
+        d[l] = info;
+    } else {
+        d[key] = info;
     }
-    $('#name').html(name);
-    if ($('#roleName').is(":hidden")) {
-        $('#roleName').show();
-    }
+    saves.saves = arrToJson(d);
 }
 
-function roleControl(role, pos, isshowName) {
-    var idName = role.name;
-    var rObj   = roles[idName];
-    var rPath  = rObj.path;
-    var rImg   = '';
-    if (rObj) {
-        //角色存在
-        if (role['img']) {
-            rImg = role['img'];
-        } else {
-            rImg = rPath + 'default.png';
-        }
-        $('#position' + pos + ' img').eq(0).attr('src', rImg);
-        if (isshowName) {
-            if (core.showName == '') {
-                showName(role.name, 0);
-            }
-        }
-
-    }
+/*
+ 读取进度
+ */
+function loadGame(chapter, sentence) {
+    nowChapter  = chapter;
+    nowSentence = sentence;
 }
+
+
 var sentences = {
-    pos: 0,
+    pos: nowSentence,
     length: 0,
     toType: '',
     getStory: function () {
@@ -356,6 +236,116 @@ var core = {
     }
 };
 
+
+function reloadAbleJSFn(id, newJS, cb) {
+    var oldjs = document.getElementById(id);
+    if (oldjs) oldjs.parentNode.removeChild(oldjs);
+    var scriptObj  = document.createElement("script");
+    scriptObj.src  = newJS;
+    scriptObj.type = "text/javascript";
+    scriptObj.id   = id;
+    document.getElementsByTagName("head")[0].appendChild(scriptObj);
+    setTimeout(function () {
+        cb();
+    }, 170);
+}
+
+function getScript(cb, t) {
+    if (!t) {
+        t = 1;
+    }
+
+    if (typeof doScript != 'object') {
+        if (t > 5) {
+            fin();
+        } else {
+            setTimeout(getScript(cb, ++t), 1000);
+        }
+    } else {
+        if (story === doScript) {
+            fin();
+        } else {
+            cb();
+        }
+    }
+
+}
+
+function getText(cb) {
+    var url = 'script/' + storyName + '/' + nowChapter + '.js';
+    //$.ajax({
+    //        type: 'get',
+    //        url: url,
+    //        dataType: 'JSONP',
+    //        jsonp: "callback",
+    //        jsonpCallback:"doScript",
+    //        //async:    false,
+    //        success: function (d) {
+    //            if (d) {
+    //                story = d;
+    //                //log(d);
+    //                cb();
+    //            } else {
+    //                fin();
+    //            }
+    //
+    //        },
+    //        error: function (d) {
+    //            //alert(d.status);
+    //            if (d.status == 404) {
+    //                fin();
+    //            }
+    //        }
+    //    }
+    //);
+    //ajax方式访问剧本
+
+    reloadAbleJSFn('script', url, function () {
+        getScript(function () {
+            story = doScript;
+            //log(d);
+            cb();
+        }, 0);
+    });
+
+    //以script src方式访问，解决跨域
+    //$('#script').attr("src", url);
+
+}
+
+function showName(name, hide) {
+    if (hide == 1) {
+        $('#roleName').hide();
+        return;
+    }
+    $('#name').html(name);
+    if ($('#roleName').is(":hidden")) {
+        $('#roleName').show();
+    }
+}
+
+function roleControl(role, pos, isshowName) {
+    var idName = role.name;
+    var rObj   = roles[idName];
+    var rPath  = rObj.path;
+    var rImg   = '';
+    if (rObj) {
+        //角色存在
+        if (role['img']) {
+            rImg = role['img'];
+        } else {
+            rImg = rPath + 'default.png';
+        }
+        $('#position' + pos + ' img').eq(0).attr('src', rImg);
+        if (isshowName) {
+            if (core.showName == '') {
+                showName(role.name, 0);
+            }
+        }
+
+    }
+}
+
 function type(toType) {
     if (toType) {
         core.toType = toType;
@@ -368,7 +358,8 @@ function start() {
     $("#canvas").remove();
     $("#start-scene").remove();
     $("#text").fadeIn(1000);
-    clearInterval(intS);
+    clearInterval(initStartButton);
+    clearInterval(initLoadButton);
     setTimeout(function () {
         begin = 1;
         sentences.getStory();
@@ -505,6 +496,34 @@ function showWord(word, rate, color) {
     }, 1000 / rate);
 
 }
+
+function openLoadUI(){
+    event.stopPropagation();
+    if(auto){
+        autoPlay();
+    }
+    if(skipping){
+        skipPlay();
+    }
+    $(function(){
+        $("#closeLoadUI").css("right", -$('#closeLoadUI').width()/2);
+    });
+    showMask();
+    $("#loadUI").show();
+}
+
+
+
+function openLoadPage(){
+    $('#newSave').hide();
+    openLoadUI();
+}
+
+function openSavePage(){
+    openLoadUI();
+}
+
+
 
 
 //window.onload = function () {
