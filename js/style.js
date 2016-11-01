@@ -114,6 +114,3 @@ function hideMask(){
     });
 })();
 
-$(function(){
-    $('.imgBox').css({'width':$('.inner').width(), 'height':$('.inner').height() *0.8})
-});

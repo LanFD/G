@@ -17,8 +17,9 @@ var end;
 var scenePath   = 'img/scene/';
 var saves       = window.localStorage;
 var canSave     = 0;
+
 //清除存档
-saves.clear();
+//saves.clear();
 if (saves) {
     canSave = 1;
     if (typeof saves.saves == 'undefined') {
@@ -43,24 +44,106 @@ function getDate() {
  @return void
  */
 function saveGame(info, key) {
+    if(canSave != 1){
+        alert('此浏览器无法存档');
+        return;
+    }
+
     var d = jsonToArr(saves.saves);
     var l = d.length;
-    if (key == '') {
-        d[l] = info;
-    } else {
+    if (key) {
         d[key] = info;
+    } else {
+        d[l] = info;
     }
     saves.saves = arrToJson(d);
 }
 
-/*
- 读取进度
- */
-function loadGame(chapter, sentence) {
-    nowChapter  = chapter;
-    nowSentence = sentence;
+
+function openLoadUI(saveOrLoad){
+    event.stopPropagation();
+    if(auto){
+        autoPlay();
+    }
+    if(skipping){
+        skipPlay();
+    }
+    $(".savesDel").remove();
+    var data = jsonToArr(saves.saves);
+    var html = '';
+    var cf;
+    if(saveOrLoad == 'save'){
+            cf = function(x,y,z){
+            return 'confirmSave('+x+')';
+        }
+    }else {
+            cf = function(x,y,z){
+            return 'confirmLoad('+y+','+z+')';
+        }
+
+    }
+    $.each(data, function(i,v){
+         if(i > 0){
+              html += '<div class="saves savesDel" onclick="'+cf(i,v['chapter'],v['sentence'])+'">\n\
+                          <div class="inner">\n\
+                            <div class="imgBox"><img src="'+v['img']+'"></div>\n\
+                            <div class="innerMsg">存档'+i+' '+v['time']+'</div>\n\
+                          </div>\n\
+                         </div>'
+         }
+    });
+    $('.savesZone').prepend(html);
+    $(function(){
+        $("#closeLoadUI").css("right", -$('#closeLoadUI').width()/2);
+        $('.imgBox').css({'width':$('.inner').width(), 'height':$('.inner').height() *0.8})
+    });
+    showMask();
+    $("#loadUI").show();
 }
 
+function closeLoadUI(){
+    $("#loadUI").hide();
+    hideMask();
+}
+
+function openLoadPage(){
+    openLoadUI('load');
+    $('#newSave').hide();
+}
+
+function openSavePage(){
+    openLoadUI('save');
+    $('#newSave').show();
+}
+
+function confirmSave(key){
+    var info ={
+        "chapter": nowChapter,
+        "sentence":sentences.pos,
+        "img":$(".pt-page-current img").attr("src"),
+        "time": getDate()
+    };
+    if(key){
+        saveGame(info, key);
+    }else {
+        saveGame(info);
+    }
+    alert("存档完毕");
+    closeLoadUI();
+}
+
+function confirmLoad(ch, sen){
+    nowChapter  = ch;
+    nowSentence = sen;
+    closeLoadUI();
+    if(begin == 1){
+        //已开始
+        story = '';
+        start();
+    }else {
+        start();
+    }
+}
 
 var sentences = {
     pos: nowSentence,
@@ -72,6 +155,47 @@ var sentences = {
             sentences.charge();
         };
         getText(cb);
+
+        function getText(cb) {
+            var url = 'script/' + storyName + '/' + nowChapter + '.js';
+            //$.ajax({
+            //        type: 'get',
+            //        url: url,
+            //        dataType: 'JSONP',
+            //        jsonp: "callback",
+            //        jsonpCallback:"doScript",
+            //        //async:    false,
+            //        success: function (d) {
+            //            if (d) {
+            //                story = d;
+            //                //log(d);
+            //                cb();
+            //            } else {
+            //                fin();
+            //            }
+            //
+            //        },
+            //        error: function (d) {
+            //            //alert(d.status);
+            //            if (d.status == 404) {
+            //                fin();
+            //            }
+            //        }
+            //    }
+            //);
+            //ajax方式访问剧本
+
+            reloadAbleJSFn('script', url, function () {
+                getScript(function () {
+                    story = doScript;
+                    //log(d);
+                    cb();
+                }, 0);
+            });
+            //以script src方式访问，解决跨域
+            //$('#script').attr("src", url);
+        }
+
     },
     getSentence: function () {
         this.toType = story[this.pos];
@@ -236,7 +360,6 @@ var core = {
     }
 };
 
-
 function reloadAbleJSFn(id, newJS, cb) {
     var oldjs = document.getElementById(id);
     if (oldjs) oldjs.parentNode.removeChild(oldjs);
@@ -247,7 +370,7 @@ function reloadAbleJSFn(id, newJS, cb) {
     document.getElementsByTagName("head")[0].appendChild(scriptObj);
     setTimeout(function () {
         cb();
-    }, 170);
+    }, 340);
 }
 
 function getScript(cb, t) {
@@ -268,49 +391,6 @@ function getScript(cb, t) {
             cb();
         }
     }
-
-}
-
-function getText(cb) {
-    var url = 'script/' + storyName + '/' + nowChapter + '.js';
-    //$.ajax({
-    //        type: 'get',
-    //        url: url,
-    //        dataType: 'JSONP',
-    //        jsonp: "callback",
-    //        jsonpCallback:"doScript",
-    //        //async:    false,
-    //        success: function (d) {
-    //            if (d) {
-    //                story = d;
-    //                //log(d);
-    //                cb();
-    //            } else {
-    //                fin();
-    //            }
-    //
-    //        },
-    //        error: function (d) {
-    //            //alert(d.status);
-    //            if (d.status == 404) {
-    //                fin();
-    //            }
-    //        }
-    //    }
-    //);
-    //ajax方式访问剧本
-
-    reloadAbleJSFn('script', url, function () {
-        getScript(function () {
-            story = doScript;
-            //log(d);
-            cb();
-        }, 0);
-    });
-
-    //以script src方式访问，解决跨域
-    //$('#script').attr("src", url);
-
 }
 
 function showName(name, hide) {
@@ -354,12 +434,18 @@ function type(toType) {
     core.start();
 }
 
-function start() {
+function hideCover(){
     $("#canvas").remove();
     $("#start-scene").remove();
     $("#text").fadeIn(1000);
     clearInterval(initStartButton);
     clearInterval(initLoadButton);
+}
+
+function start() {
+    if(!begin){
+        hideCover();
+    }
     setTimeout(function () {
         begin = 1;
         sentences.getStory();
@@ -497,31 +583,7 @@ function showWord(word, rate, color) {
 
 }
 
-function openLoadUI(){
-    event.stopPropagation();
-    if(auto){
-        autoPlay();
-    }
-    if(skipping){
-        skipPlay();
-    }
-    $(function(){
-        $("#closeLoadUI").css("right", -$('#closeLoadUI').width()/2);
-    });
-    showMask();
-    $("#loadUI").show();
-}
 
-
-
-function openLoadPage(){
-    $('#newSave').hide();
-    openLoadUI();
-}
-
-function openSavePage(){
-    openLoadUI();
-}
 
 
 

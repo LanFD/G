@@ -255,6 +255,7 @@ html, body {
 }
 .savesZone{
     display: table;
+    width: 100%;
 }
 .saves{
     width: 30%;
@@ -264,6 +265,7 @@ html, body {
     display: table-cell;
 }
 .inner{
+    width: 100%;
     padding: 3%;
     margin: 3%;
     border: solid 1px #ccc;

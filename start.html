@@ -14,81 +14,15 @@
     <title>Ht Works</title>
 </head>
 <body>
-<div id="mask" class="mask" style=""></div>
-<div id="loadUI" class="loadUI" style="">
+<div id="mask" class="mask" style="display: none"></div>
+<div id="loadUI" class="loadUI" style="display: none">
     <div class="savesControl">
         <div class="savesControlInfo">选择存档</div>
         <img id="closeLoadUI" class="func_closeButton parent2" style="position: absolute;top:-100%;height: 200%" src="img/button/close.png">
     </div>
     <div class="savesOuter">
         <div class="savesZone">
-            <div class="saves">
-                <div class="inner">
-                    <div class="imgBox"><img src="img/scene/s1.jpg"></div>
-                    <div class="innerMsg">存档1  2016-9-9 16:09:09</div>
-                </div>
-            </div>
-            <div class="saves">
-                <div class="inner">
-                    <div class="imgBox"><img src="img/scene/s1.jpg"></div>
-                    <div class="innerMsg">存档1  2016-9-9 16:09:09</div>
-                </div>
-            </div>
-            <div class="saves">
-                <div class="inner">
-                    <div class="imgBox"><img src="img/scene/s1.jpg"></div>
-                    <div class="innerMsg">存档1  2016-9-9 16:09:09</div>
-                </div>
-            </div>
-            <div class="saves">
-                <div class="inner">
-                    <div class="imgBox"><img src="img/scene/s1.jpg"></div>
-                    <div class="innerMsg">存档1  2016-9-9 16:09:09</div>
-                </div>
-            </div>
-            <div class="saves">
-                <div class="inner">
-                    <div class="imgBox"><img src="img/scene/s1.jpg"></div>
-                    <div class="innerMsg">存档1  2016-9-9 16:09:09</div>
-                </div>
-            </div>
-            <div class="saves">
-                <div class="inner">
-                    <div class="imgBox"><img src="img/scene/s1.jpg"></div>
-                    <div class="innerMsg">存档1  2016-9-9 16:09:09</div>
-                </div>
-            </div>
-            <div class="saves">
-                <div class="inner">
-                    <div class="imgBox"><img src="img/scene/s1.jpg"></div>
-                    <div class="innerMsg">存档1  2016-9-9 16:09:09</div>
-                </div>
-            </div><div class="saves">
-            <div class="inner">
-                <div class="imgBox"><img src="img/scene/s1.jpg"></div>
-                <div class="innerMsg">存档1  2016-9-9 16:09:09</div>
-            </div>
-        </div>
-
-            <div class="saves">
-                <div class="inner">
-                    <div class="imgBox"><img src="img/scene/s1.jpg"></div>
-                    <div class="innerMsg">存档1  2016-9-9 16:09:09</div>
-                </div>
-            </div>
-            <div class="saves">
-                <div class="inner">
-                    <div class="imgBox"><img src="img/scene/s1.jpg"></div>
-                    <div class="innerMsg">存档1  2016-9-9 16:09:09</div>
-                </div>
-            </div>
-            <div class="saves">
-                <div class="inner">
-                    <div class="imgBox"><img src="img/scene/s1.jpg"></div>
-                    <div class="innerMsg">存档1  2016-9-9 16:09:09</div>
-                </div>
-            </div>
-            <div class="saves" id="newSave">
+            <div class="saves" id="newSave" onclick="confirmSave(0)">
                 <div class="inner">
                     <div class="imgBox"><img src="img/button/plus.png"></div>
                     <div class="innerMsg">新存档位</div>
@@ -148,7 +82,7 @@
                         <span id="autoPlay">off</span>
                     </a>
                     |
-                    <a id="save" href="#" onclick="">
+                    <a id="save" href="#" onclick="openSavePage(0)">
                         save
                     </a>
                     |
