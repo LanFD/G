@@ -44,7 +44,7 @@ function getDate() {
  @return void
  */
 function saveGame(info, key) {
-    if(canSave != 1){
+    if (canSave != 1) {
         alert('此浏览器无法存档');
         return;
     }
@@ -60,87 +60,102 @@ function saveGame(info, key) {
 }
 
 
-function openLoadUI(saveOrLoad){
+function openLoadUI(saveOrLoad) {
     event.stopPropagation();
-    if(auto){
+    if (auto) {
         autoPlay();
     }
-    if(skipping){
+    if (skipping) {
         skipPlay();
     }
     $(".savesDel").remove();
     var data = jsonToArr(saves.saves);
     var html = '';
     var cf;
-    if(saveOrLoad == 'save'){
-            cf = function(x,y,z){
-            return 'confirmSave('+x+')';
+    if (saveOrLoad == 'save') {
+        cf = function (x, y, z) {
+            return 'confirmSave(' + x + ')';
         }
-    }else {
-            cf = function(x,y,z){
-            return 'confirmLoad('+y+','+z+')';
+    } else {
+        cf = function (x, y, z) {
+            return 'confirmLoad(' + y + ',' + z + ')';
         }
 
     }
-    $.each(data, function(i,v){
-         if(i > 0){
-              html += '<div class="saves savesDel" onclick="'+cf(i,v['chapter'],v['sentence'])+'">\n\
+    $.each(data, function (i, v) {
+        if (i > 0) {
+            html += '<div class="saves savesDel" onclick="' + cf(i, v['chapter'], v['sentence']) + '">\n\
                           <div class="inner">\n\
-                            <div class="imgBox"><img src="'+v['img']+'"></div>\n\
-                            <div class="innerMsg">存档'+i+' '+v['time']+'</div>\n\
+                            <div class="imgBox"><img src="' + v['img'] + '"></div>\n\
+                            <div class="innerMsg">存档' + i + ' ' + v['time'] + '</div>\n\
                           </div>\n\
                          </div>'
-         }
+        }
     });
     $('.savesZone').prepend(html);
-    $(function(){
-        $("#closeLoadUI").css("right", -$('#closeLoadUI').width()/2);
-        $('.imgBox').css({'width':$('.inner').width(), 'height':$('.inner').height() *0.8})
+    $(function () {
+        $("#closeLoadUI").css("right", -$('#closeLoadUI').width() / 2);
+        $('.imgBox').css({'width': $('.inner').width(), 'height': $('.inner').height() * 0.8})
     });
     showMask();
     $("#loadUI").show();
 }
 
-function closeLoadUI(){
+function closeLoadUI() {
     $("#loadUI").hide();
     hideMask();
 }
 
-function openLoadPage(){
+function openLoadPage() {
     openLoadUI('load');
     $('#newSave').hide();
 }
 
-function openSavePage(){
+function openSavePage() {
     openLoadUI('save');
     $('#newSave').show();
 }
 
-function confirmSave(key){
-    var info ={
+function confirmSave(key) {
+    var info = {
         "chapter": nowChapter,
-        "sentence":sentences.pos,
-        "img":$(".pt-page-current img").attr("src"),
-        "time": getDate()
+        "sentence": sentences.pos,
+        "img": $(".pt-page-current img").attr("src"),
+        "time": getDate(),
+        "bgm":$('#audio').attr('src'),
+        "role":[
+            {
+            "class": $('#position').attr('class'),
+            "img":$('#position img').attr('src')
+            },
+            {
+                "class": $('#position2').attr('class'),
+                "img":$('#position2 img').attr('src')
+            },
+            {
+                "class": $('#position3').attr('class'),
+                "img":$('#position3 img').attr('src')
+            }
+        ]
     };
-    if(key){
+    if (key) {
         saveGame(info, key);
-    }else {
+    } else {
         saveGame(info);
     }
     alert("存档完毕");
     closeLoadUI();
 }
 
-function confirmLoad(ch, sen){
+function confirmLoad(ch, sen) {
     nowChapter  = ch;
     nowSentence = sen;
     closeLoadUI();
-    if(begin == 1){
+    if (begin == 1) {
         //已开始
         story = '';
         start();
-    }else {
+    } else {
         start();
     }
 }
@@ -150,52 +165,76 @@ var sentences = {
     length: 0,
     toType: '',
     getStory: function () {
-        var cb = function () {
-            sentences.getLength();
-            sentences.charge();
-        };
-        getText(cb);
+        var url = 'script/' + storyName + '/' + nowChapter + '.js';
+        //$.ajax({
+        //        type: 'get',
+        //        url: url,
+        //        dataType: 'JSONP',
+        //        jsonp: "callback",
+        //        jsonpCallback:"doScript",
+        //        //async:    false,
+        //        success: function (d) {
+        //            if (d) {
+        //                story = d;
+        //                //log(d);
+        //                cb();
+        //            } else {
+        //                fin();
+        //            }
+        //
+        //        },
+        //        error: function (d) {
+        //            //alert(d.status);
+        //            if (d.status == 404) {
+        //                fin();
+        //            }
+        //        }
+        //    }
+        //);
+        //ajax方式访问剧本
 
-        function getText(cb) {
-            var url = 'script/' + storyName + '/' + nowChapter + '.js';
-            //$.ajax({
-            //        type: 'get',
-            //        url: url,
-            //        dataType: 'JSONP',
-            //        jsonp: "callback",
-            //        jsonpCallback:"doScript",
-            //        //async:    false,
-            //        success: function (d) {
-            //            if (d) {
-            //                story = d;
-            //                //log(d);
-            //                cb();
-            //            } else {
-            //                fin();
-            //            }
-            //
-            //        },
-            //        error: function (d) {
-            //            //alert(d.status);
-            //            if (d.status == 404) {
-            //                fin();
-            //            }
-            //        }
-            //    }
-            //);
-            //ajax方式访问剧本
+        this.reloadAbleJSFn('script', url, function () {
+            sentences.getScript(function () {
+                story = doScript;
+                //log(d);
+                sentences.getLength();
+                sentences.charge();
+            }, 0);
+        });
+        //以script src方式访问，解决跨域
+        //$('#script').attr("src", url);
 
-            reloadAbleJSFn('script', url, function () {
-                getScript(function () {
-                    story = doScript;
-                    //log(d);
-                    cb();
-                }, 0);
-            });
-            //以script src方式访问，解决跨域
-            //$('#script').attr("src", url);
+    },
+    reloadAbleJSFn: function (id, newJS, cb) {
+        var oldjs = document.getElementById(id);
+        if (oldjs) oldjs.parentNode.removeChild(oldjs);
+        var scriptObj  = document.createElement("script");
+        scriptObj.src  = newJS;
+        scriptObj.type = "text/javascript";
+        scriptObj.id   = id;
+        document.getElementsByTagName("head")[0].appendChild(scriptObj);
+        setTimeout(function () {
+            cb();
+        }, 340);
+    },
+    getScript: function (cb, t) {
+        if (!t) {
+            t = 1;
         }
 
+        if (typeof doScript != 'object') {
+            if (t > 5) {
+                fin();
+            } else {
+                setTimeout(this.getScript(cb, ++t), 1000);
+            }
+        } else {
+            if (story === doScript) {
+                fin();
+            } else {
+                cb();
+            }
+        }
     },
     getSentence: function () {
         this.toType = story[this.pos];
@@ -360,39 +399,6 @@ var core = {
     }
 };
 
-function reloadAbleJSFn(id, newJS, cb) {
-    var oldjs = document.getElementById(id);
-    if (oldjs) oldjs.parentNode.removeChild(oldjs);
-    var scriptObj  = document.createElement("script");
-    scriptObj.src  = newJS;
-    scriptObj.type = "text/javascript";
-    scriptObj.id   = id;
-    document.getElementsByTagName("head")[0].appendChild(scriptObj);
-    setTimeout(function () {
-        cb();
-    }, 340);
-}
-
-function getScript(cb, t) {
-    if (!t) {
-        t = 1;
-    }
-
-    if (typeof doScript != 'object') {
-        if (t > 5) {
-            fin();
-        } else {
-            setTimeout(getScript(cb, ++t), 1000);
-        }
-    } else {
-        if (story === doScript) {
-            fin();
-        } else {
-            cb();
-        }
-    }
-}
-
 function showName(name, hide) {
     if (hide == 1) {
         $('#roleName').hide();
@@ -434,7 +440,7 @@ function type(toType) {
     core.start();
 }
 
-function hideCover(){
+function hideCover() {
     $("#canvas").remove();
     $("#start-scene").remove();
     $("#text").fadeIn(1000);
@@ -443,7 +449,7 @@ function hideCover(){
 }
 
 function start() {
-    if(!begin){
+    if (!begin) {
         hideCover();
     }
     setTimeout(function () {
@@ -582,10 +588,6 @@ function showWord(word, rate, color) {
     }, 1000 / rate);
 
 }
-
-
-
-
 
 
 //window.onload = function () {
