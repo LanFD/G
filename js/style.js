@@ -64,6 +64,7 @@ function hideMask(){
      关闭按钮点击关闭 parentx 的x层parent
      */
     $(".func_closeButton").click(function(){
+        event.stopPropagation();
         var parent = $(this).attr("class").match(/parent\d/);
         if (parent) {
             parent = parseInt(parent[0].replace('parent', ''));
@@ -74,6 +75,18 @@ function hideMask(){
             p.hide();
         }
         hideMask();
+    });
+
+    $(".func_delSaveButton").click(function(){
+        event.stopPropagation();
+        var saveId = $(this).attr("class").match(/saveId\d/);
+        if(saveId){
+            if(confirm('确认删除此存档吗？')){
+                saveId = parseInt(saveId[0].replace('saveId', ''));
+                delSave(saveId);
+                $(this).parent().parent().parent().fadeOut(1000);
+            }
+        }
     });
 
     $(".toolMask").mouseover(function () {

@@ -4,7 +4,6 @@ var wordTime         = 100;  //字间隔时间
 
 var textObj     = document.getElementById('content');
 var nowChapter  = 1;    //第几章节
-var nowSentence = 0;    //第几句
 var auto        = 0;    //是否auto play
 var begin       = 0;    //是否开始阅读
 var storyName   = 'storyname1';
@@ -12,14 +11,13 @@ var tkl;                    //click 闪烁
 var skipping    = 0;   //是否正在快进
 var doScript    = 0;   //读取的剧本
 var story;
-var interval;
 var end;
 var scenePath   = 'img/scene/';
 var saves       = window.localStorage;
 var canSave     = 0;
 
 //清除存档
-//saves.clear();
+saves.clear();
 if (saves) {
     canSave = 1;
     if (typeof saves.saves == 'undefined') {
@@ -29,6 +27,12 @@ if (saves) {
     }
 } else {
     alert('此浏览器不支持localStorage，存档功能将无法使用');
+}
+function udToEp(x){
+    if(typeof x == 'undefined'){
+        return '';
+    }
+    return x;
 }
 
 function getDate() {
@@ -48,7 +52,6 @@ function saveGame(info, key) {
         alert('此浏览器无法存档');
         return;
     }
-
     var d = jsonToArr(saves.saves);
     var l = d.length;
     if (key) {
@@ -59,6 +62,15 @@ function saveGame(info, key) {
     saves.saves = arrToJson(d);
 }
 
+//删除存档 i 第几个存档
+function delSave(i){
+    var d = jsonToArr(saves.saves);
+    var l = d.length;
+    if(l > i){
+        d.splice(i,1);
+        saves.saves = arrToJson(d);
+    }
+}
 
 function openLoadUI(saveOrLoad) {
     event.stopPropagation();
@@ -73,32 +85,33 @@ function openLoadUI(saveOrLoad) {
     var html = '';
     var cf;
     if (saveOrLoad == 'save') {
-        cf = function (x, y, z) {
+        cf = function (x) {
             return 'confirmSave(' + x + ')';
         }
     } else {
-        cf = function (x, y, z) {
-            return 'confirmLoad(' + y + ',' + z + ')';
+        cf = function (x) {
+            return 'confirmLoad(' + x + ')';
         }
 
     }
     $.each(data, function (i, v) {
         if (i > 0) {
-            html += '<div class="saves savesDel" onclick="' + cf(i, v['chapter'], v['sentence']) + '">\n\
+            html += '<div class="saves savesDel" onclick="' + cf(i) + '">\n\
                           <div class="inner">\n\
-                            <div class="imgBox"><img src="' + v['img'] + '"></div>\n\
+                            <div class="imgBox" style="background: url(' + v['img'] + ')">'+v['text']+'</div>\n\
                             <div class="innerMsg">存档' + i + ' ' + v['time'] + '</div>\n\
+                              <img class="delButton func_delSaveButton saveId'+i+'" src="img/button/close.png">\n\
                           </div>\n\
                          </div>'
         }
     });
     $('.savesZone').prepend(html);
+    showMask();
+    $("#loadUI").show();
     $(function () {
         $("#closeLoadUI").css("right", -$('#closeLoadUI').width() / 2);
         $('.imgBox').css({'width': $('.inner').width(), 'height': $('.inner').height() * 0.8})
     });
-    showMask();
-    $("#loadUI").show();
 }
 
 function closeLoadUI() {
@@ -120,6 +133,7 @@ function confirmSave(key) {
     var info = {
         "chapter": nowChapter,
         "sentence": sentences.pos,
+        "text":$("#content").innerText,
         "img": $(".pt-page-current img").attr("src"),
         "time": getDate(),
         "bgm":$('#audio').attr('src'),
@@ -147,13 +161,28 @@ function confirmSave(key) {
     closeLoadUI();
 }
 
-function confirmLoad(ch, sen) {
-    nowChapter  = ch;
-    nowSentence = sen;
+function confirmLoad(i) {
+    var data = jsonToArr(saves.saves);
+    data = data[i];
+    nowChapter = data.chapter;
+    $('#audio').attr('src', data.bgm);
+    $(".pt-page-current img").attr("src", data.img);
+    $('#position').attr('class',data.role[0]['class']);
+    $('#position img').attr('src', udToEp(data.role[0]['img']));
+    $('#position2').attr('class',data.role[1]['class']);
+    $('#position2 img').attr('src', udToEp(data.role[1]['img']));
+    $('#position3').attr('class',data.role[2]['class']);
+    $('#position3 img').attr('src', udToEp(data.role[2]['img']));
     closeLoadUI();
-    if (begin == 1) {
-        //已开始
+    sentences.pos = data.sentence - 1;
+    if (begin == 1 || end == 1) {
+        //已开始或已结束
         story = '';
+        textObj.className = 'content';
+        end = 0;
+        textClear();
+        core.toNext = 0;
+        core.ini();
         start();
     } else {
         start();
@@ -161,7 +190,7 @@ function confirmLoad(ch, sen) {
 }
 
 var sentences = {
-    pos: nowSentence,
+    pos: 0,
     length: 0,
     toType: '',
     getStory: function () {
@@ -236,17 +265,14 @@ var sentences = {
             }
         }
     },
-    getSentence: function () {
-        this.toType = story[this.pos];
-    },
     getLength: function () {
         this.length = story.length;
     },
     charge: function () {
         if (this.pos < this.length) {
-            this.getSentence();
+            this.toType = story[this.pos];
             this.pos++;
-            type(this.toType);
+            core.type(this.toType);
         } else {
             this.pos = 0;
             nowChapter++;
@@ -254,8 +280,8 @@ var sentences = {
         }
     }
 };
-
 var core = {
+    process:'',
     arr: [],
     length: 0,
     pos: 0,
@@ -339,9 +365,9 @@ var core = {
             this.toAct = {};
         }
 
-        interval = setInterval(function () {
+        core.process = setInterval(function () {
             if (typeof(core.arr[core.pos]) == 'undefined') {
-                clearInterval(interval);
+                clearInterval(core.process);
                 core.ini();
                 if (end != 1) {
                     core.beginNext();
@@ -365,7 +391,7 @@ var core = {
         // log('i=' + interval);
     },
     finish: function () {
-        clearInterval(interval);
+        clearInterval(core.process);
         (function () {
             for (i = core.pos; i < core.length; i++) {
                 textObj.innerHTML += core.arr[i];
@@ -391,11 +417,19 @@ var core = {
             }, nextSentenceTime);
         }
     },
+    type:function (c) {
+        if (c) {
+            core.toType = c;
+        }
+        this.ini();
+        this.start();
+    },
     ini: function () {
         this.arr    = [];
         this.pos    = 0;
         this.length = 0;
         this.next   = 0;
+        clearInterval(core.process);
     }
 };
 
@@ -430,14 +464,6 @@ function roleControl(role, pos, isshowName) {
         }
 
     }
-}
-
-function type(toType) {
-    if (toType) {
-        core.toType = toType;
-    }
-    core.ini();
-    core.start();
 }
 
 function hideCover() {
@@ -492,7 +518,7 @@ function fin() {
     auto              = 0;
     end               = 1;
     textObj.className = 'fin';
-    type('      F     i     n ');
+    core.type('      F     i     n ');
 }
 
 function bgmSwitch() {
