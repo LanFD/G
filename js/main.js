@@ -96,11 +96,13 @@ function openLoadUI(saveOrLoad) {
     }
     $.each(data, function (i, v) {
         if (i > 0) {
-            html += '<div class="saves savesDel" onclick="' + cf(i) + '">\n\
+            log(v);
+            html += '<div class="saves savesDel" >\n\
                           <div class="inner">\n\
-                            <div class="imgBox" style="background: url(' + v['img'] + ')">'+v['text']+'</div>\n\
-                            <div class="innerMsg">存档' + i + ' ' + v['time'] + '</div>\n\
-                              <img class="delButton func_delSaveButton saveId'+i+'" src="img/button/close.png">\n\
+                            <div onclick="' + cf(i) + '" class="imgBox" style="background: url(' + v['img'] + ')">'+v['text']+'</div>\n\
+                            <div class="innerMsg">存档' + i + ' ' + v['time'] + '\n\
+                              <img class="func_delSaveButton delButton  saveId'+i+'" src="img/button/close.png">\n\
+                            </div>\n\
                           </div>\n\
                          </div>'
         }
@@ -133,7 +135,7 @@ function confirmSave(key) {
     var info = {
         "chapter": nowChapter,
         "sentence": sentences.pos,
-        "text":$("#content").innerText,
+        "text":$("#content").text(),
         "img": $(".pt-page-current img").attr("src"),
         "time": getDate(),
         "bgm":$('#audio').attr('src'),

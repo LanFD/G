@@ -214,7 +214,7 @@ html, body {
     bottom: 15%;
     color: white;
     padding: 0 1%;
-/ / background: lightpink;
+//  background: lightpink;
     width: 100%;
 
 }
@@ -321,7 +321,8 @@ html, body {
     height: 120%;
     float: right;
     position: absolute;
-    bottom: 0px
+    bottom: 0px;
+    z-index: 9;
 }
 
 .changeWordColor {
