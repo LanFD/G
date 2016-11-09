@@ -77,17 +77,6 @@ function hideMask(){
         hideMask();
     });
 
-    $(".func_delSaveButton").click(function(){
-        event.stopPropagation();
-        var saveId = $(this).attr("class").match(/saveId\d/);
-        if(saveId){
-            if(confirm('确认删除此存档吗？')){
-                saveId = parseInt(saveId[0].replace('saveId', ''));
-                delSave(saveId);
-                $(this).parent().parent().parent().fadeOut(1000);
-            }
-        }
-    });
 
     $(".toolMask").mouseover(function () {
         $(".tool").stop();

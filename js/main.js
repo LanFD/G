@@ -17,13 +17,12 @@ var saves       = window.localStorage;
 var canSave     = 0;
 
 //清除存档
-saves.clear();
+//saves.clear();
 if (saves) {
     canSave = 1;
     if (typeof saves.saves == 'undefined') {
         //初始化
         saves.saves = arrToJson(['init']);
-        log(saves);
     }
 } else {
     alert('此浏览器不支持localStorage，存档功能将无法使用');
@@ -100,8 +99,8 @@ function openLoadUI(saveOrLoad) {
             html += '<div class="saves savesDel" >\n\
                           <div class="inner">\n\
                             <div onclick="' + cf(i) + '" class="imgBox" style="background: url(' + v['img'] + ')">'+v['text']+'</div>\n\
-                            <div class="innerMsg">存档' + i + ' ' + v['time'] + '\n\
-                              <img class="func_delSaveButton delButton  saveId'+i+'" src="img/button/close.png">\n\
+                            <div  class="innerMsg">存档' + i + ' ' + v['time'] + '\n\
+                              <img onclick="confirmDelSave(' + i + ', this)" class="delButton" src="img/button/close.png">\n\
                             </div>\n\
                           </div>\n\
                          </div>'
@@ -135,7 +134,7 @@ function confirmSave(key) {
     var info = {
         "chapter": nowChapter,
         "sentence": sentences.pos,
-        "text":$("#content").text(),
+        "text":$("#content").text().replace('click__', ''),
         "img": $(".pt-page-current img").attr("src"),
         "time": getDate(),
         "bgm":$('#audio').attr('src'),
@@ -161,6 +160,14 @@ function confirmSave(key) {
     }
     alert("存档完毕");
     closeLoadUI();
+}
+
+function confirmDelSave(x,t) {
+    event.stopPropagation();
+    if (confirm('确认删除此存档吗？')) {
+        delSave(x);
+        $(t).parent().parent().parent().parent().fadeOut(1000);
+    }
 }
 
 function confirmLoad(i) {
@@ -395,7 +402,7 @@ var core = {
     finish: function () {
         clearInterval(core.process);
         (function () {
-            for (i = core.pos; i < core.length; i++) {
+            for (var i = core.pos; i < core.length; i++) {
                 textObj.innerHTML += core.arr[i];
             }
         })();
@@ -594,7 +601,7 @@ function waitToClick() {
     if ($('#waitToClick').length > 0) {
         twinkle($('#waitToClick'));
     } else {
-        var c = '<span id="waitToClick" class="right-corner">   click</span>';
+        var c = '<span id="waitToClick" class="right-corner">click<span style="display: none">__</span></span>';
         textObj.innerHTML += c;
         twinkle($('#waitToClick'));
     }
@@ -624,4 +631,6 @@ function showWord(word, rate, color) {
 //            start()
 //        }, 1000);
 //};
+
+
 

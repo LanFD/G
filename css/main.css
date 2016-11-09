@@ -284,7 +284,6 @@ html, body {
     width: 30%;
     float: left;
     margin: 1.5%;
-    overflow: hidden;
     display: table-cell;
 }
 
@@ -294,7 +293,7 @@ html, body {
     margin: 3%;
     border: solid 1px #ccc;
     text-align: center;
-    height: 140px;
+    height: 160px;
     display: table-cell;
 }
 
@@ -318,11 +317,17 @@ html, body {
 }
 
 .delButton {
-    height: 120%;
+    height: 100%;
     float: right;
     position: absolute;
-    bottom: 0px;
+    bottom: 0;
+    right:0;
     z-index: 9;
+    opacity: 0.5;
+}
+
+.delButton:hover{
+    opacity: 1;
 }
 
 .changeWordColor {
