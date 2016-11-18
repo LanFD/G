@@ -95,7 +95,6 @@ function openLoadUI(saveOrLoad) {
     }
     $.each(data, function (i, v) {
         if (i > 0) {
-            log(v);
             html += '<div class="saves savesDel" >\n\
                           <div class="inner">\n\
                             <div onclick="' + cf(i) + '" class="imgBox" style="background: url(' + v['img'] + ')">'+v['text']+'</div>\n\
@@ -320,7 +319,7 @@ var core = {
 
         if (typeof (this.toType['hideRole']) == 'number') {
             //隐藏角色
-            $("#roleDiv div").hide();
+            this.roleHide();
         }
 
         if (typeof (this.toType['showName']) == 'string') {
@@ -338,24 +337,25 @@ var core = {
 
         if (typeof (this.toType['role']) == 'object') {
             //角色出场
+            this.roleHide();
             switch (this.toType['role'].length) {
                 case 1:
                     $('#position').removeClass().addClass('roleImg r1 left_15');
-                    roleControl(this.toType['role'][0], '', 1);
+                    this.roleControl(this.toType['role'][0], '', 1);
                     break;
                 case 2:
                     $('#position').removeClass().addClass('roleImg r2 left_4');
                     $('#position2').removeClass().addClass('roleImg r2 right_4 filter-gray');
-                    roleControl(this.toType['role'][0], '', 1);
-                    roleControl(this.toType['role'][1], '2', 0);
+                    this.roleControl(this.toType['role'][0], '', 1);
+                    this.roleControl(this.toType['role'][1], '2', 0);
                     break;
                 default:
                     $('#position').removeClass().addClass('roleImg r3 ');
                     $('#position2').removeClass().addClass('roleImg r3 left_33 filter-gray');
                     $('#position3').removeClass().addClass('roleImg r3 left_66 filter-gray');
-                    roleControl(this.toType['role'][0], '', 1);
-                    roleControl(this.toType['role'][1], '2', 0);
-                    roleControl(this.toType['role'][2], '3', 0);
+                    this.roleControl(this.toType['role'][0], '', 1);
+                    this.roleControl(this.toType['role'][1], '2', 0);
+                    this.roleControl(this.toType['role'][2], '3', 0);
                     break;
             }
             if (typeof (this.toType['role'][0]['action']) == 'object') {
@@ -368,8 +368,6 @@ var core = {
                 });
             }
             $("#roleDiv div").show();
-
-
         } else {
             this.toAct = {};
         }
@@ -398,6 +396,32 @@ var core = {
 
         }, wordTime);
         // log('i=' + interval);
+    },
+    roleHide:function(){
+        $(".roleImg img").each(function(){
+            $(this).attr('src', '');
+        });
+    },
+    roleControl:function(role, pos, isshowName){
+        var idName = role.name;
+        var rObj   = roles[idName];
+        var rPath  = rObj.path;
+        var rImg   = '';
+        if (rObj) {
+            //角色存在
+            if (role['img']) {
+                rImg = role['img'];
+            } else {
+                rImg = rPath + 'default.png';
+            }
+            $('#position' + pos + ' img').eq(0).attr('src', rImg);
+            if (isshowName) {
+                if (core.showName == '') {
+                    showName(role.name, 0);
+                }
+            }
+
+        }
     },
     finish: function () {
         clearInterval(core.process);
@@ -450,28 +474,6 @@ function showName(name, hide) {
     $('#name').html(name);
     if ($('#roleName').is(":hidden")) {
         $('#roleName').show();
-    }
-}
-
-function roleControl(role, pos, isshowName) {
-    var idName = role.name;
-    var rObj   = roles[idName];
-    var rPath  = rObj.path;
-    var rImg   = '';
-    if (rObj) {
-        //角色存在
-        if (role['img']) {
-            rImg = role['img'];
-        } else {
-            rImg = rPath + 'default.png';
-        }
-        $('#position' + pos + ' img').eq(0).attr('src', rImg);
-        if (isshowName) {
-            if (core.showName == '') {
-                showName(role.name, 0);
-            }
-        }
-
     }
 }
 

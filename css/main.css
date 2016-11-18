@@ -186,6 +186,11 @@ html, body {
     padding: 1%;
     opacity: 1;
     line-height: 20px;
+    -moz-user-select:none;/*火狐*/
+    -webkit-user-select:none;/*webkit浏览器*/
+    -ms-user-select:none;/*IE10*/
+    -khtml-user-select:none;/*早期浏览器*/
+    user-select:none;
 }
 
 .fin {
@@ -333,6 +338,10 @@ html, body {
 .changeWordColor {
     animation: wordColor 4s;
     animation-iteration-count: infinite;
+}
+
+.hide{
+    display: none;
 }
 
 @keyframes wordColor {
