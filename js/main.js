@@ -626,6 +626,11 @@ function showWord(word, rate, color) {
 
 }
 
+//事件监视
+function eventWatch(){
+
+}
+
 
 //window.onload = function () {
 //    setTimeout(
