@@ -348,6 +348,35 @@ html, body {
 .hide{
     display: none;
 }
+#choice{
+    display: table-cell;
+    vertical-align: middle;
+    width: 100%;
+    height:100%;
+}
+.tbs{
+    position: absolute;
+    width: 100%;
+    height:80%;
+    display: table;
+    vertical-align: middle;
+}
+.choseOption{
+    margin: 10% auto 0;
+    width: auto;
+    text-align: center;
+    font-size: 18px;
+
+
+}
+.choseOption span {
+    color: white;
+    background: black;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.2) none repeat scroll !important;
+
+}
+
 
 @keyframes wordColor {
     0% {
