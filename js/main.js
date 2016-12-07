@@ -2,30 +2,32 @@
 var nextSentenceTime = 1000; //句子间隔时间
 var wordTime         = 100;  //字间隔时间
 
-var textObj     = document.getElementById('content');
-var nowChapter  = 1;    //第几章节
-var auto        = 0;    //是否auto play
-var begin       = 0;    //是否开始阅读
-var storyName   = 'storyname1';
+var textObj       = document.getElementById('content');
+var nowChapter    = 1;    //第几章节
+var auto          = 0;    //是否auto play
+var begin         = 0;    //是否开始阅读
+var storyName     = 'storyname1';
 var tkl;                    //click 闪烁
-var skipping    = 0;   //是否正在快进
-var doScript    = 0;   //读取的剧本
+var skipping      = 0;   //是否正在快进
+var doScript      = 0;   //读取的剧本
+var getScriptType = 'jsReload';  //jsonp 和jsReload方式
 var story;
 var end;
-var scenePath   = 'img/scene/';
-var saves       = window.localStorage;
-var canSave     = 0;
-
+var scenePath     = 'img/scene/';
+var saves         = window.localStorage;
+var canSave       = 0;
+saves.clear();
 //清除存档
 //saves.clear();
 if (saves) {
     canSave = 1;
     if (typeof saves.saves == 'undefined') {
         //初始化
-        saves.saves = arrToJson(['init']);
+        saves.saves  = arrToJson(['init']);
+        saves.chosen = [];
     }
 } else {
-    alert('此浏览器不支持localStorage，存档功能将无法使用');
+    alert('此浏览器不支持localStorage，读存档功能将无法使用');
 }
 function udToEp(x){
     if(typeof x == 'undefined'){
@@ -201,43 +203,56 @@ var sentences = {
     pos: 0,
     length: 0,
     toType: '',
+    ajaxFunc:function(url, cb){
+        $.ajax({
+                type: 'get',
+                url: url,
+                dataType: 'JSONP',
+                jsonp: "callback",
+                jsonpCallback:"doScript",
+                //async:    false,
+                success: function (d) {
+                    if (d) {
+                        story = d;
+                        //log(d);
+                        cb();
+                    } else {
+                        fin();
+                    }
+
+                },
+                error: function (d) {
+                    log(d);
+                    //alert(d.status);
+                    if (d.status == 404) {
+                        fin();
+                    }
+                }
+            }
+        );
+    },
     getStory: function () {
         var url = 'script/' + storyName + '/' + nowChapter + '.js';
-        //$.ajax({
-        //        type: 'get',
-        //        url: url,
-        //        dataType: 'JSONP',
-        //        jsonp: "callback",
-        //        jsonpCallback:"doScript",
-        //        //async:    false,
-        //        success: function (d) {
-        //            if (d) {
-        //                story = d;
-        //                //log(d);
-        //                cb();
-        //            } else {
-        //                fin();
-        //            }
-        //
-        //        },
-        //        error: function (d) {
-        //            //alert(d.status);
-        //            if (d.status == 404) {
-        //                fin();
-        //            }
-        //        }
-        //    }
-        //);
-        //ajax方式访问剧本
 
-        this.reloadAbleJSFn('script', url, function () {
-            sentences.getScript(function () {
-                story = doScript;
-                //log(d);
-                sentences.getLength();
-                sentences.charge();
-            }, 0);
-        });
+        if (getScriptType == 'jsonp') {
+            this.ajaxFunc(url, function () {
+                sentences.getScript(function () {
+                    story = doScript;
+                    //log(d);
+                    sentences.getLength();
+                    sentences.charge();
+                }, 0);
+            })
+        } else if (getScriptType == 'jsReload') {
+            this.reloadAbleJSFn('script', url, function () {
+                sentences.getScript(function () {
+                    story = doScript;
+                    //log(d);
+                    sentences.getLength();
+                    sentences.charge();
+                }, 0);
+            });
+        }
         //以script src方式访问，解决跨域
         //$('#script').attr("src", url);
 
@@ -258,7 +273,6 @@ var sentences = {
         if (!t) {
             t = 1;
         }
-
         if (typeof doScript != 'object') {
             if (t > 5) {
                 fin();
@@ -300,6 +314,22 @@ var core = {
     sound: $('#sound')[0],
     start: function () {
         //log(this.toType);
+        if(typeof (this.toType['option']) == 'object'){
+            $('#mask').show();
+            $('.tbs').css('display','table');
+            $('#choice').css('display','table-cell');
+            $('#choice').empty();
+            var opts ='';
+            $(this.toType['option']).each(function(i,v){
+                opts += '<a onclick="core.chooseOpt('+i+')"><div class="choseOption">\n\
+                           <span>\n\
+                           '+v['text'] +'\n\
+                           </span>\n\
+                           </div></a>';
+            });
+            $('#choice').append(opts);
+            return;
+        }
         if (typeof (this.toType['text']) == 'string') {
             this.arr = this.toType['text'].split('');
         } else {
@@ -396,6 +426,20 @@ var core = {
 
         }, wordTime);
         // log('i=' + interval);
+    },
+    chooseOpt:function(x){
+        var chosen = this.toType['option'][x];
+        if (udToEp(chosen.var) != '') {
+            var reg       = /[\*+=%-\/]+/;
+            var operation = reg.exec(chosen.var)[0];
+            var key       = chosen.var.split(operation);
+            var value     = parseFloat(key[1]);
+                key       = $.trim(key[0]);
+            var toExt     = "saves.chosen['"+key+"']"+operation+value;
+            log(toExt);
+            eval(toExt);
+            log(saves.chosen )
+        }
     },
     roleHide:function(){
         $(".roleImg img").each(function(){
