@@ -24,7 +24,6 @@ if (saves) {
     if (typeof saves.saves == 'undefined') {
         //初始化
         saves.saves  = arrToJson(['init']);
-        saves.chosen = [];
     }
 } else {
     alert('此浏览器不支持localStorage，读存档功能将无法使用');
@@ -233,7 +232,7 @@ var sentences = {
     },
     getStory: function () {
         var url = 'script/' + storyName + '/' + nowChapter + '.js';
-
+        log(url);
         if (getScriptType == 'jsonp') {
             this.ajaxFunc(url, function () {
                 sentences.getScript(function () {
@@ -315,19 +314,7 @@ var core = {
     start: function () {
         //log(this.toType);
         if(typeof (this.toType['option']) == 'object'){
-            $('#mask').show();
-            $('.tbs').css('display','table');
-            $('#choice').css('display','table-cell');
-            $('#choice').empty();
-            var opts ='';
-            $(this.toType['option']).each(function(i,v){
-                opts += '<a onclick="core.chooseOpt('+i+')"><div class="choseOption">\n\
-                           <span>\n\
-                           '+v['text'] +'\n\
-                           </span>\n\
-                           </div></a>';
-            });
-            $('#choice').append(opts);
+            this.showChoose();
             return;
         }
         if (typeof (this.toType['text']) == 'string') {
@@ -427,19 +414,53 @@ var core = {
         }, wordTime);
         // log('i=' + interval);
     },
+    showChoose:function(){
+        $('#mask').show();
+        $('.tbs').css('display','table');
+        $('#choice').css('display','table-cell');
+        $('#choice').empty();
+        var opts ='';
+        $(this.toType['option']).each(function(i,v){
+            opts += '<a onclick="core.chooseOpt('+i+')"><div class="choseOption">\n\
+                           <span>\n\
+                           '+v['text'] +'\n\
+                           </span>\n\
+                           </div></a>';
+        });
+        $('#choice').append(opts);
+    },
+    hideChoose:function(){
+        $('#mask').hide();
+        $('.tbs').css('display','none');
+        $('#choice').css('display','none');
+        $('#choice').empty();
+    },
     chooseOpt:function(x){
         var chosen = this.toType['option'][x];
         if (udToEp(chosen.var) != '') {
             var reg       = /[\*+=%-\/]+/;
             var operation = reg.exec(chosen.var)[0];
-            var key       = chosen.var.split(operation);
-            var value     = parseFloat(key[1]);
-                key       = $.trim(key[0]);
-            var toExt     = "saves.chosen['"+key+"']"+operation+value;
-            log(toExt);
+            var keyW      = chosen.var.split(operation);
+            var value     = parseFloat(keyW[1]);
+                keyW      = $.trim(keyW[0]);
+                keyW      = 'chosen_'+keyW;
+            if(typeof saves[keyW] =='undefined'){
+                saves[keyW] = 0;
+            }
+            var toExt     = "saves[keyW]"+operation+value;
             eval(toExt);
-            log(saves.chosen )
         }
+        core.hideChoose();
+        if(udToEp(chosen.goto) != ''){
+            story      = '';
+            nowChapter = chosen.goto;
+            sentences.pos = 0;
+            sentences.getStory();
+        }else {
+            finish();
+            finish();
+        }
+
     },
     roleHide:function(){
         $(".roleImg img").each(function(){
