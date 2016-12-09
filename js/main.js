@@ -16,7 +16,7 @@ var end;
 var scenePath     = 'img/scene/';
 var saves         = window.localStorage;
 var canSave       = 0;
-saves.clear();
+var varTmp        = {};
 //清除存档
 //saves.clear();
 if (saves) {
@@ -138,6 +138,7 @@ function confirmSave(key) {
         "img": $(".pt-page-current img").attr("src"),
         "time": getDate(),
         "bgm":$('#audio').attr('src'),
+        "var":varTmp,
         "role":[
             {
             "class": $('#position').attr('class'),
@@ -182,6 +183,7 @@ function confirmLoad(i) {
     $('#position2 img').attr('src', udToEp(data.role[1]['img']));
     $('#position3').attr('class',data.role[2]['class']);
     $('#position3 img').attr('src', udToEp(data.role[2]['img']));
+    varTmp = data.var;
     closeLoadUI();
     sentences.pos = data.sentence - 1;
     if (begin == 1 || end == 1) {
@@ -444,10 +446,11 @@ var core = {
             var value     = parseFloat(keyW[1]);
                 keyW      = $.trim(keyW[0]);
                 keyW      = 'chosen_'+keyW;
-            if(typeof saves[keyW] =='undefined'){
-                saves[keyW] = 0;
+
+            if(typeof varTmp[keyW] =='undefined'){
+                varTmp[keyW] = 0;
             }
-            var toExt     = "saves[keyW]"+operation+value;
+            var toExt     = "varTmp[keyW]"+operation+value;
             eval(toExt);
         }
         core.hideChoose();
