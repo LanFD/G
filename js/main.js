@@ -24,7 +24,6 @@ var varTmp        = {};
     $(".roleImg").css("bottom", $("#text").height() + 'px');
 
     if(navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)){
-        log('移动端');
         //移动端
         $('.main').css({"width":"100%","height":"100%"});
         $('.img').css({"top":"0","height":"100%"});
@@ -42,12 +41,10 @@ window.onload = function() {
 function judgeScreen(i){
     var v = $(window).height() / $(window).width();
     if (v > 1.1) {
-        log('please landscape the device');
         $('#onload').empty();
         $('#onload').append('<span>请横屏</span>');
         $('#onload').show();
     } else {
-        log($('.roleImg').height());
         $('.roleImg').css('height',$(window).height() - $('#text').height());
         $(".roleImg").css("bottom", $("#text").height() + 'px');
         $('#onload').empty();
@@ -272,7 +269,6 @@ var sentences = {
     },
     getStory: function () {
         var url = 'script/' + storyName + '/' + nowChapter + '.js';
-        log(url);
         if (getScriptType == 'jsonp') {
             this.ajaxFunc(url, function () {
                 sentences.getScript(function () {
