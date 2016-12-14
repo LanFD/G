@@ -40,6 +40,9 @@ window.onload = function() {
 function judgeScreen(i){
     if(typeof window.orientation == 'undefined'){
         //pc端
+        if(i ==1000){
+            bgmSwitch();
+        }
         $('#onload').empty();
         $('#onload').hide(i);
         return;
