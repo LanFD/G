@@ -1,6 +1,6 @@
 //@author Ht  mail 382354412@qq.com
 var nextSentenceTime = 1000; //句子间隔时间
-var wordTime         = 100;  //字间隔时间
+var wordTime         = 70;  //字间隔时间
 
 var textObj       = document.getElementById('content');
 var nowChapter    = 1;    //第几章节
@@ -17,6 +17,32 @@ var scenePath     = 'img/scene/';
 var saves         = window.localStorage;
 var canSave       = 0;
 var varTmp        = {};
+
+//判断设备
+(function(){
+    if(navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)){
+        //移动端
+        $('.main').css({"width":"100%","height":"100%"});
+        $('.img').css({"top":"0","height":"100%"});
+        window.addEventListener("onorientationchange" in window ? "orientationchange" : "resize", function() {
+              judgeScreen();
+        }, false);
+    }
+    $('.roleImg').css('height',$('.roleImg').height - $('.tool').height)
+})();
+
+function judgeScreen(){
+    var v =$(window).height()/$(window).width();
+    if(v>1.1){
+        log('please landscape the device');
+        alert('请横屏');
+
+        showBlackMask();
+    }else {
+        hideMask();
+    }
+}
+
 //清除存档
 //saves.clear();
 if (saves) {
@@ -694,12 +720,9 @@ function showWord(word, rate, color) {
 
 }
 
-//事件监视
-function eventWatch(){
-
-}
-
-
+window.onload = function() {
+    $('#onload').hide(1000);
+};
 //window.onload = function () {
 //    setTimeout(
 //        function () {

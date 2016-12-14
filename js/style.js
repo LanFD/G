@@ -52,7 +52,13 @@ function nowTimeStamp() {
 function showMask(){
     $('#mask').show();
 }
+function showBlackMask(){
+    $('.mask').css('opacity',1);
+    $('#mask').show();
+}
+
 function hideMask(){
+    $('.mask').css('opacity',0.7);
     $('#mask').hide();
 }
 
@@ -78,14 +84,6 @@ function hideMask(){
     });
 
 
-    $(".toolMask").mouseover(function () {
-        $(".tool").stop();
-        $(".tool").fadeIn(300);
-    });
-    $(".toolMask").mouseleave(function () {
-        $(".tool").stop();
-        $(".tool").fadeOut(300);
-    });
 
     $("#startButton span, #loadButton span").mouseover(function () {
         var Bid = $(this).parent().attr("id");

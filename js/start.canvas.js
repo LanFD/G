@@ -47,7 +47,7 @@ function startCanvas(){
             _this.pos.x = Math.random()*width;
             _this.pos.y = height+Math.random()*100;
             _this.alpha = 0.1+Math.random()*0.3;
-            _this.scale = 0.1+Math.random()*0.3;
+            _this.scale = width/20000+Math.random()*0.3;
             _this.velocity = Math.random();
         }
 
@@ -56,7 +56,7 @@ function startCanvas(){
                 init();
             }
             _this.pos.y -= _this.velocity;
-            _this.alpha -= 0.0005;
+            _this.alpha -= 0.0005*(1000/height);
             ctx.beginPath();
             ctx.arc(_this.pos.x, _this.pos.y, _this.scale*10, 0, 2 * Math.PI, false);
             ctx.fillStyle = 'rgba(255,255,255,'+ _this.alpha+')';
