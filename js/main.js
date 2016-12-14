@@ -20,26 +20,38 @@ var varTmp        = {};
 
 //判断设备
 (function(){
+    $('.roleImg').css('height',$(window).height() - $('#text').height());
+    $(".roleImg").css("bottom", $("#text").height() + 'px');
+
     if(navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)){
+        log('移动端');
         //移动端
         $('.main').css({"width":"100%","height":"100%"});
         $('.img').css({"top":"0","height":"100%"});
         window.addEventListener("onorientationchange" in window ? "orientationchange" : "resize", function() {
-              judgeScreen();
+            judgeScreen(0);
         }, false);
     }
-    $('.roleImg').css('height',$('.roleImg').height - $('.tool').height)
 })();
 
-function judgeScreen(){
-    var v =$(window).height()/$(window).width();
-    if(v>1.1){
-        log('please landscape the device');
-        alert('请横屏');
 
-        showBlackMask();
-    }else {
-        hideMask();
+window.onload = function() {
+    judgeScreen(1000);
+};
+
+function judgeScreen(i){
+    var v = $(window).height() / $(window).width();
+    if (v > 1.1) {
+        log('please landscape the device');
+        $('#onload').empty();
+        $('#onload').append('<span>请横屏</span>');
+        $('#onload').show();
+    } else {
+        log($('.roleImg').height());
+        $('.roleImg').css('height',$(window).height() - $('#text').height());
+        $(".roleImg").css("bottom", $("#text").height() + 'px');
+        $('#onload').empty();
+        $('#onload').hide(i);
     }
 }
 
@@ -193,7 +205,7 @@ function confirmDelSave(x,t) {
     event.stopPropagation();
     if (confirm('确认删除此存档吗？')) {
         delSave(x);
-        $(t).parent().parent().parent().parent().fadeOut(1000);
+        $(t).parent().parent().parent().fadeOut(1000);
     }
 }
 
@@ -720,9 +732,6 @@ function showWord(word, rate, color) {
 
 }
 
-window.onload = function() {
-    $('#onload').hide(1000);
-};
 //window.onload = function () {
 //    setTimeout(
 //        function () {

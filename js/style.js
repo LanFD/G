@@ -63,7 +63,6 @@ function hideMask(){
 }
 
 (function () {
-    $(".roleImg").css("bottom", $("#text").height() + 'px');
     aniStartButton();
     aniLoadButton();
     /*
