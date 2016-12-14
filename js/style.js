@@ -81,9 +81,11 @@ function hideMask(){
         }
         hideMask();
     });
-
-
-
+    $('body').on("click",'.mobileIniMusic',function(){
+        bgmSwitch();
+        $(this).removeClass();
+        $(this).hide();
+    });
     $("#startButton span, #loadButton span").mouseover(function () {
         var Bid = $(this).parent().attr("id");
         switch  (Bid){

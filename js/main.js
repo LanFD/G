@@ -22,14 +22,13 @@ var varTmp        = {};
 (function(){
     $('.roleImg').css('height',$(window).height() - $('#text').height());
     $(".roleImg").css("bottom", $("#text").height() + 'px');
-
     if(navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)){
         //移动端
         $('.main').css({"width":"100%","height":"100%"});
         $('.img').css({"top":"0","height":"100%"});
-        window.addEventListener("onorientationchange" in window ? "orientationchange" : "resize", function() {
+        $(window).resize(function() {
             judgeScreen(0);
-        }, false);
+        });
     }
 })();
 
@@ -39,17 +38,32 @@ window.onload = function() {
 };
 
 function judgeScreen(i){
-    var v = $(window).height() / $(window).width();
-    if (v > 1.1) {
+    if(typeof window.orientation == 'undefined'){
+        //pc端
+        $('#onload').empty();
+        $('#onload').hide(i);
+        return;
+    }
+
+    if (window.orientation === 180 || window.orientation === 0) {
         $('#onload').empty();
         $('#onload').append('<span>请横屏</span>');
         $('#onload').show();
-    } else {
+    }
+    if (window.orientation === 90 || window.orientation === -90 ){
         $('.roleImg').css('height',$(window).height() - $('#text').height());
         $(".roleImg").css("bottom", $("#text").height() + 'px');
         $('#onload').empty();
-        $('#onload').hide(i);
+        if(i == 0){
+            $('#onload').hide(i);
+        }else {
+            $('#onload').empty();
+            $('#onload').addClass('mobileIniMusic');
+            $('#onload').append('<span>请触摸屏幕</span>');
+        }
+
     }
+
 }
 
 //清除存档
