@@ -19,7 +19,9 @@ var canSave       = 0;
 var varTmp        = {};
 var isMobile      = 0; //0 pc ,1 mobile
 var iniMusic      = 0;
+log(document.documentElement.clientHeight);
 
+log(screen.height);
 //判断设备
 (function(){
     $('.roleImg').css('height',$('.img').height() - $('#text').height());
@@ -51,23 +53,30 @@ window.onload = function() {
 };
 
 function judgeScreen(i){
+    $('.roleImg').css('height',$('.img').height() - $('#text').height());
+    $(".roleImg").css("bottom", $("#text").height());
     if (window.orientation === 180 || window.orientation === 0) {
         $('#onload').empty();
         $('#onload').append('<span>请横屏</span>');
         $('#onload').show();
     }
     if (window.orientation === 90 || window.orientation === -90 ){
-        $('.roleImg').css('height',$('.img').height() - $('#text').height());
-        $(".roleImg").css("bottom", $("#text").height());
-        $('#onload').empty();
         if(iniMusic != 0){
             $('#onload').hide(i);
         }else {
+            if ($('body').height() <= screen.height) {
+                $('body').height(screen.height);
+                alert(screen.height+'-'+$(document).height());jh
+                 $('.main').css('height',screen.height);
+            }
+            setTimeout(function () {
+               //   window.scrollTo(0,addHeight)
+            }, 100);
+
             $('#onload').empty();
             $('#onload').addClass('mobileIniMusic');
             $('#onload').append('<span>请触摸屏幕</span>');
         }
-
     }
 
 }
