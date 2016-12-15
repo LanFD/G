@@ -17,47 +17,50 @@ var scenePath     = 'img/scene/';
 var saves         = window.localStorage;
 var canSave       = 0;
 var varTmp        = {};
+var isMobile      = 0; //0 pc ,1 mobile
+var iniMusic      = 0;
 
 //判断设备
 (function(){
-    $('.roleImg').css('height',$(window).height() - $('#text').height());
-    $(".roleImg").css("bottom", $("#text").height() + 'px');
-    if(navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)){
+    $('.roleImg').css('height',$('.img').height() - $('#text').height());
+    $(".roleImg").css("bottom", $("#text").height());
+
+    $('body').on("click",'.mobileIniMusic',function(){
+        bgmSwitch();
+        iniMusic = 1;
+        $(this).removeClass();
+        $(this).hide();
+    });
+
+    if(typeof window.orientation != 'undefined'){
         //移动端
+        isMobile = 1;
         $('.main').css({"width":"100%","height":"100%"});
         $('.img').css({"top":"0","height":"100%"});
         $(window).resize(function() {
             judgeScreen(0);
         });
+    }else {
+        bgmSwitch();
+        $('#onload').empty();
+        $('#onload').hide(1000);
     }
 })();
-
-
 window.onload = function() {
     judgeScreen(1000);
 };
 
 function judgeScreen(i){
-    if(typeof window.orientation == 'undefined'){
-        //pc端
-        if(i ==1000){
-            bgmSwitch();
-        }
-        $('#onload').empty();
-        $('#onload').hide(i);
-        return;
-    }
-
     if (window.orientation === 180 || window.orientation === 0) {
         $('#onload').empty();
         $('#onload').append('<span>请横屏</span>');
         $('#onload').show();
     }
     if (window.orientation === 90 || window.orientation === -90 ){
-        $('.roleImg').css('height',$(window).height() - $('#text').height());
-        $(".roleImg").css("bottom", $("#text").height() + 'px');
+        $('.roleImg').css('height',$('.img').height() - $('#text').height());
+        $(".roleImg").css("bottom", $("#text").height());
         $('#onload').empty();
-        if(i == 0){
+        if(iniMusic != 0){
             $('#onload').hide(i);
         }else {
             $('#onload').empty();
@@ -653,7 +656,9 @@ function fin() {
 
 function bgmSwitch() {
     var audio = $('#audio')[0];
-    event.stopPropagation();
+    if(event){
+        event.stopPropagation();
+    }
     if (audio.paused) {
         audio.play();
         $('#bgm').html('on');
