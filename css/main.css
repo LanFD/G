@@ -102,7 +102,6 @@ html, body {
     font-size: 20px;
     color: white;
     display: none;
-    box-sizing: border-box;
     padding: 0 5px;
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 

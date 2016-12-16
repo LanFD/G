@@ -19,9 +19,6 @@ var canSave       = 0;
 var varTmp        = {};
 var isMobile      = 0; //0 pc ,1 mobile
 var iniMusic      = 0;
-log(document.documentElement.clientHeight);
-
-log(screen.height);
 //判断设备
 (function(){
     $('.roleImg').css('height',$('.img').height() - $('#text').height());
@@ -30,6 +27,9 @@ log(screen.height);
     $('body').on("click",'.mobileIniMusic',function(){
         bgmSwitch();
         iniMusic = 1;
+        //setTimeout(function () {
+        //    window.scrollTo(0,addHeight)
+        //}, 1000);
         $(this).removeClass();
         $(this).hide();
     });
@@ -40,6 +40,7 @@ log(screen.height);
         $('.main').css({"width":"100%","height":"100%"});
         $('.img').css({"top":"0","height":"100%"});
         $(window).resize(function() {
+
             judgeScreen(0);
         });
     }else {
@@ -53,8 +54,6 @@ window.onload = function() {
 };
 
 function judgeScreen(i){
-    $('.roleImg').css('height',$('.img').height() - $('#text').height());
-    $(".roleImg").css("bottom", $("#text").height());
     if (window.orientation === 180 || window.orientation === 0) {
         $('#onload').empty();
         $('#onload').append('<span>请横屏</span>');
@@ -64,14 +63,15 @@ function judgeScreen(i){
         if(iniMusic != 0){
             $('#onload').hide(i);
         }else {
-            if ($('body').height() <= screen.height) {
-                $('body').height(screen.height);
-                alert(screen.height+'-'+$(document).height());jh
-                 $('.main').css('height',screen.height);
-            }
-            setTimeout(function () {
-               //   window.scrollTo(0,addHeight)
-            }, 100);
+            //if ($('body').height() <= screen.height) {
+            //    addHeight = screen.height - $('body').height();
+            //    $('body').height(screen.height);
+            //    alert(screen.height+'-'+$(document).height());
+            //    $('.main').css('height',screen.height);
+            //}
+            //$('.roleImg').css('height',$('.img').height() - $('#text').height());
+            //$(".roleImg").css("bottom", $("#text").height());
+
 
             $('#onload').empty();
             $('#onload').addClass('mobileIniMusic');
