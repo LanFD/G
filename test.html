@@ -1,37 +1,98 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-    <style>
-        .div5{
-            display: table-cell;
-            height:200px;
-            background: #fddac2;
-            vertical-align: middle;
-        }
-        .div4{
-            height:300px;
-            display: table-cell;
-            vertical-align: middle;
-            background: #5053f8;
-        }
-        .div3{
-            display: table;
-        }
-    </style>
-</head>
+<html>
 <body>
-    <div class="div1">
-        <div class="div2">
-            <div class="div3">
-                <div class="div4">
-                    <div class="div5">
-                        第三方身份
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+<div style="margin: 0 auto; width: 100%">
+    <img id="img" style="width: 100%;position: absolute;z-index: -1" src="img/scene/start2.jpg">
+    <canvas id="canvas"></canvas>
+</div>
+
 </body>
 </html>
+<script src="js/jquery-3.1.1.min.js"></script>
+<script>
+    function getRandNum(min, max)
+    {
+        return Math.floor(Math.random() * (max - min + 1) + min)
+    }
+
+    function log(x)
+    {
+        console.log(x);
+    }
+    !function ()
+    {
+        var obj = $('#img');
+        var height, width, eleArr, middle;
+        height  = obj.height();
+        width   = obj.width();
+        middle  = [width / 2, height * (1 - 0.618)];//黄金比例
+
+        canvas        = document.getElementById('canvas');
+        canvas.width  = width;
+        canvas.height = height;
+        ctx           = canvas.getContext('2d');
+        eleArr        = [];
+        for (var i = 0; i < Math.sqrt(width * height); i += 5) {
+            eleArr.push(new OriRainDrop());
+        }
+        startAni();
+        var count = 0;
+
+        function startAni()
+        {
+            if (count % 4 == 0) {
+                ctx.clearRect(0, 0, width, height);
+            }
+            if (count > 10000) {
+                count = 0;
+            }
+
+            for (var i in eleArr) {
+                eleArr[i].draw();
+            }
+            requestAnimationFrame(startAni);
+            count++;
+        }
+
+        function OriRainDrop()
+        {
+            var t = this;
+
+            function MathR(x)
+            {
+                return x + Math.random() * (1 - x);
+            }
+
+            function init()
+            {
+                t.x = Math.random() * width * 1.2;
+                t.y = Math.random() * height * 1.2;
+                t.r = 1 + Math.random() * 4; //半径
+                t.color = t.x >= width / 2 ? [getRandNum(150, 255), 0, 0] : [255, 255, 255];
+                t.alpha = MathR(0.6);
+                t.speed = Math.random() * 2;
+                t.life  = 100 + Math.random() * 100;
+                t.xCal  = t.x < middle[0] ? MathR(0.5) : -MathR(0.5);
+                t.yCal  = t.y < middle[1] ? MathR(0.5) : -MathR(0.5);
+            }
+
+            this.draw = function ()
+            {
+                if (typeof t.life == 'undefined' || t.life <= 0) {
+                    init();
+                } else {
+                    t.life--;
+                    t.x += t.xCal;
+                    t.y += t.yCal;
+                    t.r = t.r / 1.02;
+                }
+                ctx.beginPath();
+                ctx.arc(t.x, t.y, t.r, 0, 2 * Math.PI, false);
+                ctx.fillStyle = 'rgba(' + t.color[0] + ',' + t.color[1] + ',' + t.color[2] + ',' + t.alpha + ')';
+                ctx.fill();
+            }
+        }
+
+    }();
+
+
+</script>
