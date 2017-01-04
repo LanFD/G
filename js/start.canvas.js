@@ -1,78 +1,96 @@
-function startCanvas() {
+!function ()
+{
+    var obj = $('.img');
+    var height, width, eleArr, middle;
+    height  = obj.height();
+    width   = obj.width();
+    middle  = [width / 2, height * (1 - 0.618)];//黄金比例
 
-    var width, height, largeHeader, canvas, ctx, circles, target, animateHeader = true;
-    var htmlObj = $('#canvas');
-    // Main
-    initHeader();
+    canvas        = document.getElementById('canvas');
+    canvas.width  = width;
+    canvas.height = height;
+    ctx           = canvas.getContext('2d');
+    eleArr        = [];
+    for (var i = 0; i < Math.sqrt(width * height); i += 5) {
+        eleArr.push(new OriRainDrop());
+    }
+    startAni();
+    var eLength = eleArr.length;
+    var eCount  = 0;
 
-    function initHeader() {
-        width         = htmlObj.width();
-        height        = htmlObj.height();
-        if(height > width){
-            height = width ^ height;
-            width  = height ^ width;
-            height = width ^ height;
+    function startAni()
+    {
+        ctx.clearRect(0, 0, width, height);
+        for (var i = 0; i <= eCount && i <= (eLength - 1); i++) {
+            eleArr[i].draw();
         }
-        canvas        = document.getElementById('canvas');
-        canvas.width  = width;
-        canvas.height = height;
-        ctx           = canvas.getContext('2d');
-        // create particles
-        circles = [];
-        for (var x = 0; x < width * 0.9; x++) {
-            circles.push(new Circle());
+        requestAnimationFrame(startAni);
+        if (eCount < eLength) {
+            eCount++;
         }
-        animate();
+    }
+    function MathR(x)
+    {
+        return x + Math.random() * (1 - x);
     }
 
-    function animate() {
-        if (animateHeader) {
-            ctx.clearRect(0,0, width, height);
-
-            for (var i in circles) {
-                circles[i].draw();
-            }
+    function shifting(){
+        var x = Math.random() * width * 1.2;
+        var l = Math.abs(middle[0] - x);
+        var maxL = width * 1.2 - middle[0];
+        if(l/maxL<0.4){
+            x = Math.random() * width * 1.2;
         }
-        requestAnimationFrame(animate);
+        return x;
     }
 
-    // Canvas manipulation
-    function Circle() {
-        var _this = this;
-        var w20000 = width/20000;
-        var w2     = width/2;
+    function OriRainDrop()
+    {
+        var t = this;
 
-        // constructor
-        (function () {
-            _this.pos = {};
-            init();
-        })();
-
-        function init() {
-            _this.pos.x    = Math.random() * width *1.2;
-            _this.pos.y    = height +Math.random()*100;
-            _this.alpha    = 0.1 + Math.random() * 0.9;
-            _this.scale    = w20000 + Math.random() * 0.4;
-            _this.velocity = Math.random()*1.3;
-            _this.color    = _this.pos.x < w2 ? [getRandNum(150,255),0,0]: [255,255,255];
+        function init()
+        {
+            t.x   = shifting();
+            t.y   = Math.random() * height * 1.2;
+            t.f_x = t.x + (middle[0] - t.x) * (0.1 + Math.random() * 0.4);
+            t.f_y = t.y + (middle[1] - t.y) * (0.1 + Math.random() * 0.4);
+            t.r   = 3 + Math.random() * 5; //半径
+            t.color    =  //t.x <= width / 2 ? [getRandNum(150, 255), 0, 0] :
+                getRandNum(200, 255);
+            t.color    = [t.color, t.color, t.color];
+            t.alpha    = MathR(0.6);
+            t.life     = 50 + parseInt(Math.random() * 100);
+            t.xCal     = (t.f_x - t.x) / t.life;
+            t.yCal     = (t.f_y - t.y) / t.life;
+            t.rCal     = t.r / (t.life * 5);
+            t.alphaCal = 1.1 * t.alpha / t.life
         }
 
-        this.draw = function () {
-            if (_this.alpha <= 0.05) {
+        this.draw = function ()
+        {
+            if (typeof t.life == 'undefined' || t.life <= 0) {
                 init();
+            } else {
+                t.life--;
+                t.x += t.xCal;
+                t.y += t.yCal;
+                t.r = t.r / (1 + t.rCal);
+                t.alpha -= t.alphaCal;
             }
-            _this.pos.y -= _this.velocity;
-            _this.alpha -= 0.001 + _this.alpha*0.002;
-            _this.color[0] > 0 ?  _this.color[0]-- : '';
-            _this.color[1] > 0 ?  _this.color[1]-- : '';
-            _this.color[2] > 0 ?  _this.color[2]-- : '';
             ctx.beginPath();
-            ctx.arc(_this.pos.x--, _this.pos.y, _this.scale * 10, 0, 2 * Math.PI, false);
-            ctx.fillStyle = 'rgba('+_this.color[0]+','+_this.color[1]+','+_this.color[2]+',' + _this.alpha + ')';
+
+
+            var grd = ctx.createRadialGradient(t.x, t.y, t.r / 10, t.x, t.y, t.r);
+            grd.addColorStop(0, "rgba(148,255,255," + t.alpha + ")");
+            grd.addColorStop(0.7, "rgba(" + t.color[0] + "," + t.color[0] + "," + t.color[0] + "," + t.alpha + ")");
+            grd.addColorStop(1, "rgba(255,255,255,0)");
+            ctx.fillStyle = grd;
+            ctx.fillRect(t.x - t.r, t.y - t.r, t.r * 2, t.r * 2);
+
+//                ctx.arc(t.x, t.y, t.r, 0, 2 * Math.PI, false);
+//                ctx.fillStyle = 'rgba(' + t.color[0] + ',' + t.color[1] + ',' + t.color[2] + ',' + t.alpha + ')';
             ctx.fill();
-        };
+        }
     }
 
-};
-
-startCanvas();
+}();
