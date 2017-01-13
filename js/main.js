@@ -1,30 +1,47 @@
 //@author Ht  mail 382354412@qq.com
-var nextSentenceTime = 1000; //句子间隔时间
-var wordTime         = 70;  //字间隔时间
 
-var textObj       = document.getElementById('content');
-var nowChapter    = 1;    //第几章节
-var auto          = 0;    //是否auto play
-var begin         = 0;    //是否开始阅读
-var storyName     = 'storyname1';
+var nextSentenceTime = 1000; //句子间隔时间
+var wordTime = 70;  //字间隔时间
+
+var textObj    = document.getElementById('content');
+var nowChapter = 1;    //第几章节
+var auto = 0;    //是否auto play
+var begin = 0;    //是否开始阅读
+var storyName = 'storyname1';
 var tkl;                    //click 闪烁
-var skipping      = 0;   //是否正在快进
-var doScript      = 0;   //读取的剧本
+var skipping = 0;   //是否正在快进
+var doScript = 0;   //读取的剧本
 var getScriptType = 'jsReload';  //jsonp 和jsReload方式
 var story;
 var end;
-var scenePath     = 'img/scene/';
-var saves         = window.localStorage;
-var canSave       = 0;
-var varTmp        = {};
-var isMobile      = 0; //0 pc ,1 mobile
-var iniMusic      = 0;
+var scenePath = 'img/scene/';
+var saves     = window.localStorage;
+var canSave   = 0;
+var varTmp    = {};
+var isMobile  = 0; //0 pc ,1 mobile
+var iniMusic = 0;
 //判断设备
-(function(){
-    $('.roleImg').css('height',$('.img').height() - $('#text').height());
+(function ()
+{
+
+//清除存档
+//saves.clear();
+    if (saves) {
+        canSave = 1;
+        if (typeof saves.saves == 'undefined') {
+            //初始化
+            saves.saves = arrToJson(['init']);
+        }
+    } else {
+        alert('此浏览器不支持localStorage，读存档功能将无法使用');
+    }
+
+
+    $('.roleImg').css('height', $('.img').height() - $('#text').height());
     $(".roleImg").css("bottom", $("#text").height());
 
-    $('body').on("click",'.mobileIniMusic',function(){
+    $('body').on("click", '.mobileIniMusic', function ()
+    {
         bgmSwitch();
         iniMusic = 1;
         //setTimeout(function () {
@@ -34,35 +51,100 @@ var iniMusic      = 0;
         $(this).hide();
     });
 
-    if(typeof window.orientation != 'undefined'){
+    if (typeof window.orientation != 'undefined') {
         //移动端
         isMobile = 1;
-        $('.main').css({"width":"100%","height":"100%"});
-        $('.img').css({"top":"0","height":"100%"});
-        $(window).resize(function() {
-
+        $('.main').css({"width": "100%", "height": "100%"});
+        $('.img').css({"top": "0", "height": "100%"});
+        $(window).resize(function ()
+        {
             judgeScreen(0);
         });
-    }else {
-        bgmSwitch();
-        $('#onload').empty();
-        $('#onload').hide(1000);
+    } else {
+//        bgmSwitch();
+//        $('#onload').empty();
+//        $('#onload').hide(1000);
     }
 })();
-window.onload = function() {
-    judgeScreen(1000);
+window.onload = function ()
+{
+    var iniRoleImg = [], n = 0;
+    for(var i in roles){
+        iniRoleImg[n] = roles[i].path+'default.png';
+    }
+    preLoad(iniRoleImg, function(){
+        if (isMobile == 0) {
+            loadNotice(function (t)
+            {
+                bgmSwitch();
+                t.hide(1000);
+            });
+        } else {
+            judgeScreen(1000);
+        }
+    });
+
 };
 
-function judgeScreen(i){
-    if (window.orientation === 180 || window.orientation === 0) {
-        $('#onload').empty();
-        $('#onload').append('<span>请横屏</span>');
-        $('#onload').show();
+function loadNotice()
+{
+    var obj = $('#onload');
+    obj['empty']();
+    execFunc(arguments, obj)
+}
+
+function execFunc(arg, x, n){
+    if (arg.length > 0) {
+        if (typeof  n === 'undefined')n = 0;
+        if (typeof  x === 'undefined')x = null;
+        for (var i = (arg.length - 1); i >= n; i--) {
+            if(typeof arg[i] === 'function')arg[i](x);
+        }
     }
-    if (window.orientation === 90 || window.orientation === -90 ){
-        if(iniMusic != 0){
-            $('#onload').hide(i);
-        }else {
+}
+//预加载图片
+function preLoad(arr){
+    if(arr.length > 0){
+        var arg = arguments;
+        var img = [],count = 0;
+        function loaded(){
+            count++;
+            if(count == arr.length){
+                execFunc(arg, img, 1);
+            }
+        }
+        for(var i in arr){
+            img[i] = new Image();
+            img[i].src = arr[i];
+            img[i].onload = function(){
+                loaded()
+            };
+            img[i].onerror = function(){
+                loaded()
+            }
+        }
+    }else {
+        execFunc(arguments, null, 1);
+    }
+}
+
+
+function judgeScreen(i)
+{
+    if (window.orientation === 180 || window.orientation === 0) {
+        loadNotice(function (t)
+        {
+            t.append('<span>请横屏</span>');
+            t.show();
+        });
+    }
+    if (window.orientation === 90 || window.orientation === -90) {
+        if (iniMusic != 0) {
+            loadNotice(function (t)
+            {
+                t.hide(i)
+            });
+        } else {
             //if ($('body').height() <= screen.height) {
             //    addHeight = screen.height - $('body').height();
             //    $('body').height(screen.height);
@@ -72,37 +154,29 @@ function judgeScreen(i){
             //$('.roleImg').css('height',$('.img').height() - $('#text').height());
             //$(".roleImg").css("bottom", $("#text").height());
 
-
-            $('#onload').empty();
-            $('#onload').addClass('mobileIniMusic');
-            $('#onload').append('<span>请触摸屏幕</span>');
+            loadNotice(function (t)
+            {
+                t.addClass('mobileIniMusic');
+                t.append('<span>请触摸屏幕</span>');
+            });
         }
     }
 
 }
 
-//清除存档
-//saves.clear();
-if (saves) {
-    canSave = 1;
-    if (typeof saves.saves == 'undefined') {
-        //初始化
-        saves.saves  = arrToJson(['init']);
-    }
-} else {
-    alert('此浏览器不支持localStorage，读存档功能将无法使用');
-}
-function udToEp(x){
-    if(typeof x == 'undefined'){
+function udToEp(x)
+{
+    if (typeof x == 'undefined') {
         return '';
     }
     return x;
 }
 
-function getDate() {
+function getDate()
+{
     var d = new Date();
     return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate() + ' '
-           + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+        + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
 }
 
 /*
@@ -111,7 +185,8 @@ function getDate() {
  @param key  档位
  @return void
  */
-function saveGame(info, key) {
+function saveGame(info, key)
+{
     if (canSave != 1) {
         alert('此浏览器无法存档');
         return;
@@ -127,16 +202,18 @@ function saveGame(info, key) {
 }
 
 //删除存档 i 第几个存档
-function delSave(i){
+function delSave(i)
+{
     var d = jsonToArr(saves.saves);
     var l = d.length;
-    if(l > i){
-        d.splice(i,1);
+    if (l > i) {
+        d.splice(i, 1);
         saves.saves = arrToJson(d);
     }
 }
 
-function openLoadUI(saveOrLoad) {
+function openLoadUI(saveOrLoad)
+{
     event.stopPropagation();
     if (auto) {
         autoPlay();
@@ -149,20 +226,23 @@ function openLoadUI(saveOrLoad) {
     var html = '';
     var cf;
     if (saveOrLoad == 'save') {
-        cf = function (x) {
+        cf = function (x)
+        {
             return 'confirmSave(' + x + ')';
         }
     } else {
-        cf = function (x) {
+        cf = function (x)
+        {
             return 'confirmLoad(' + x + ')';
         }
 
     }
-    $.each(data, function (i, v) {
+    $.each(data, function (i, v)
+    {
         if (i > 0) {
             html += '<div class="saves savesDel" >\n\
                           <div class="inner">\n\
-                            <div onclick="' + cf(i) + '" class="imgBox" style="background: url(' + v['img'] + ')">'+v['text']+'</div>\n\
+                            <div onclick="' + cf(i) + '" class="imgBox" style="background: url(' + v['img'] + ')">' + v['text'] + '</div>\n\
                             <div  class="innerMsg">存档' + i + ' ' + v['time'] + '\n\
                               <img onclick="confirmDelSave(' + i + ', this)" class="delButton" src="img/button/close.png">\n\
                             </div>\n\
@@ -173,48 +253,53 @@ function openLoadUI(saveOrLoad) {
     $('.savesZone').prepend(html);
     showMask();
     $("#loadUI").show();
-    $(function () {
+    $(function ()
+    {
         $("#closeLoadUI").css("right", -$('#closeLoadUI').width() / 2);
         $('.imgBox').css({'width': $('.inner').width(), 'height': $('.inner').height() * 0.8})
     });
 }
 
-function closeLoadUI() {
+function closeLoadUI()
+{
     $("#loadUI").hide();
     hideMask();
 }
 
-function openLoadPage() {
+function openLoadPage()
+{
     openLoadUI('load');
     $('#newSave').hide();
 }
 
-function openSavePage() {
+function openSavePage()
+{
     openLoadUI('save');
     $('#newSave').show();
 }
 
-function confirmSave(key) {
+function confirmSave(key)
+{
     var info = {
         "chapter": nowChapter,
         "sentence": sentences.pos,
-        "text":$("#content").text().replace('click__', ''),
+        "text": $("#content").text().replace('click__', ''),
         "img": $(".pt-page-current img").attr("src"),
         "time": getDate(),
-        "bgm":$('#audio').attr('src'),
-        "var":varTmp,
-        "role":[
+        "bgm": $('#audio').attr('src'),
+        "var": varTmp,
+        "role": [
             {
-            "class": $('#position').attr('class'),
-            "img":$('#position img').attr('src')
+                "class": $('#position').attr('class'),
+                "img": $('#position img').attr('src')
             },
             {
                 "class": $('#position2').attr('class'),
-                "img":$('#position2 img').attr('src')
+                "img": $('#position2 img').attr('src')
             },
             {
                 "class": $('#position3').attr('class'),
-                "img":$('#position3 img').attr('src')
+                "img": $('#position3 img').attr('src')
             }
         ]
     };
@@ -227,7 +312,8 @@ function confirmSave(key) {
     closeLoadUI();
 }
 
-function confirmDelSave(x,t) {
+function confirmDelSave(x, t)
+{
     event.stopPropagation();
     if (confirm('确认删除此存档吗？')) {
         delSave(x);
@@ -235,26 +321,27 @@ function confirmDelSave(x,t) {
     }
 }
 
-function confirmLoad(i) {
-    var data = jsonToArr(saves.saves);
-    data = data[i];
+function confirmLoad(i)
+{
+    var data   = jsonToArr(saves.saves);
+    data       = data[i];
     nowChapter = data.chapter;
     $('#audio').attr('src', data.bgm);
     $(".pt-page-current img").attr("src", data.img);
-    $('#position').attr('class',data.role[0]['class']);
+    $('#position').attr('class', data.role[0]['class']);
     $('#position img').attr('src', udToEp(data.role[0]['img']));
-    $('#position2').attr('class',data.role[1]['class']);
+    $('#position2').attr('class', data.role[1]['class']);
     $('#position2 img').attr('src', udToEp(data.role[1]['img']));
-    $('#position3').attr('class',data.role[2]['class']);
+    $('#position3').attr('class', data.role[2]['class']);
     $('#position3 img').attr('src', udToEp(data.role[2]['img']));
     varTmp = data.var;
     closeLoadUI();
     sentences.pos = data.sentence - 1;
     if (begin == 1 || end == 1) {
         //已开始或已结束
-        story = '';
+        story             = '';
         textObj.className = 'content';
-        end = 0;
+        end               = 0;
         textClear();
         core.toNext = 0;
         core.ini();
@@ -268,15 +355,17 @@ var sentences = {
     pos: 0,
     length: 0,
     toType: '',
-    ajaxFunc:function(url, cb){
+    ajaxFunc: function (url, cb)
+    {
         $.ajax({
                 type: 'get',
                 url: url,
                 dataType: 'JSONP',
                 jsonp: "callback",
-                jsonpCallback:"doScript",
+                jsonpCallback: "doScript",
                 //async:    false,
-                success: function (d) {
+                success: function (d)
+                {
                     if (d) {
                         story = d;
                         //log(d);
@@ -286,7 +375,8 @@ var sentences = {
                     }
 
                 },
-                error: function (d) {
+                error: function (d)
+                {
                     log(d);
                     //alert(d.status);
                     if (d.status == 404) {
@@ -296,32 +386,39 @@ var sentences = {
             }
         );
     },
-    getStory: function () {
+    getStory: function ()
+    {
         var url = 'script/' + storyName + '/' + nowChapter + '.js';
         if (getScriptType == 'jsonp') {
-            this.ajaxFunc(url, function () {
-                sentences.getScript(function () {
+            this.ajaxFunc(url, function ()
+            {
+                sentences.getScript(function ()
+                {
                     story = doScript;
                     //log(d);
                     sentences.getLength();
                     sentences.charge();
                 }, 0);
             })
-        } else if (getScriptType == 'jsReload') {
-            this.reloadAbleJSFn('script', url, function () {
-                sentences.getScript(function () {
-                    story = doScript;
-                    //log(d);
-                    sentences.getLength();
-                    sentences.charge();
-                }, 0);
-            });
-        }
+        } else
+            if (getScriptType == 'jsReload') {
+                this.reloadAbleJSFn('script', url, function ()
+                {
+                    sentences.getScript(function ()
+                    {
+                        story = doScript;
+                        //log(d);
+                        sentences.getLength();
+                        sentences.charge();
+                    }, 0);
+                });
+            }
         //以script src方式访问，解决跨域
         //$('#script').attr("src", url);
 
     },
-    reloadAbleJSFn: function (id, newJS, cb) {
+    reloadAbleJSFn: function (id, newJS, cb)
+    {
         var oldjs = document.getElementById(id);
         if (oldjs) oldjs.parentNode.removeChild(oldjs);
         var scriptObj  = document.createElement("script");
@@ -329,11 +426,13 @@ var sentences = {
         scriptObj.type = "text/javascript";
         scriptObj.id   = id;
         document.getElementsByTagName("head")[0].appendChild(scriptObj);
-        setTimeout(function () {
+        setTimeout(function ()
+        {
             cb();
         }, 340);
     },
-    getScript: function (cb, t) {
+    getScript: function (cb, t)
+    {
         if (!t) {
             t = 1;
         }
@@ -347,14 +446,36 @@ var sentences = {
             if (story === doScript) {
                 fin();
             } else {
-                cb();
+                var toLoad = [],n = 0;
+                for (var i in doScript){
+                    if(typeof doScript[i].scene!= 'undefined' && doScript[i].scene!=''){
+                        toLoad[n] = scenePath + doScript[i].scene;
+                        n++;
+                    }
+                    if(typeof doScript[i].role!= 'undefined'){
+                        for(var x in doScript[i].role){
+                            if(doScript[i].role[x].img){
+                                toLoad[n] = roles[doScript[i].role[x].name].path + doScript[i].role[x].img;
+                                n++;
+                            }
+
+                        }
+
+                    }
+
+                }
+                preLoad(toLoad, function(){
+                    cb()
+                });
             }
         }
     },
-    getLength: function () {
+    getLength: function ()
+    {
         this.length = story.length;
     },
-    charge: function () {
+    charge: function ()
+    {
         if (this.pos < this.length) {
             this.toType = story[this.pos];
             this.pos++;
@@ -366,8 +487,8 @@ var sentences = {
         }
     }
 };
-var core = {
-    process:'',
+var core      = {
+    process: '',
     arr: [],
     length: 0,
     pos: 0,
@@ -376,9 +497,10 @@ var core = {
     toAct: [],
     showName: '',
     sound: $('#sound')[0],
-    start: function () {
+    start: function ()
+    {
         //log(this.toType);
-        if(typeof (this.toType['option']) == 'object'){
+        if (typeof (this.toType['option']) == 'object') {
             this.showChoose();
             return;
         }
@@ -442,7 +564,8 @@ var core = {
             }
             if (typeof (this.toType['role'][0]['action']) == 'object') {
                 //人物动作
-                $(this.toType['role'][0]['action']).each(function (i, e) {
+                $(this.toType['role'][0]['action']).each(function (i, e)
+                {
                     core.toAct[e['delay'] - 1] = {"act": e['name']};
                     if (typeof (e["sound"]) != 'undefined') {
                         core.toAct[e['delay'] - 1].sound = e["sound"];
@@ -454,7 +577,8 @@ var core = {
             this.toAct = {};
         }
 
-        core.process = setInterval(function () {
+        core.process = setInterval(function ()
+        {
             if (typeof(core.arr[core.pos]) == 'undefined') {
                 clearInterval(core.process);
                 core.ini();
@@ -479,61 +603,68 @@ var core = {
         }, wordTime);
         // log('i=' + interval);
     },
-    showChoose:function(){
+    showChoose: function ()
+    {
         $('#mask').show();
-        $('.tbs').css('display','table');
-        $('#choice').css('display','table-cell');
+        $('.tbs').css('display', 'table');
+        $('#choice').css('display', 'table-cell');
         $('#choice').empty();
-        var opts ='';
-        $(this.toType['option']).each(function(i,v){
-            opts += '<a onclick="core.chooseOpt('+i+')"><div class="choseOption">\n\
+        var opts = '';
+        $(this.toType['option']).each(function (i, v)
+        {
+            opts += '<a onclick="core.chooseOpt(' + i + ')"><div class="choseOption">\n\
                            <span>\n\
-                           '+v['text'] +'\n\
+                           ' + v['text'] + '\n\
                            </span>\n\
                            </div></a>';
         });
         $('#choice').append(opts);
     },
-    hideChoose:function(){
+    hideChoose: function ()
+    {
         $('#mask').hide();
-        $('.tbs').css('display','none');
-        $('#choice').css('display','none');
+        $('.tbs').css('display', 'none');
+        $('#choice').css('display', 'none');
         $('#choice').empty();
     },
-    chooseOpt:function(x){
+    chooseOpt: function (x)
+    {
         var chosen = this.toType['option'][x];
         if (udToEp(chosen.var) != '') {
             var reg       = /[\*+=%-\/]+/;
             var operation = reg.exec(chosen.var)[0];
             var keyW      = chosen.var.split(operation);
             var value     = parseFloat(keyW[1]);
-                keyW      = $.trim(keyW[0]);
-                keyW      = 'chosen_'+keyW;
+            keyW          = $.trim(keyW[0]);
+            keyW          = 'chosen_' + keyW;
 
-            if(typeof varTmp[keyW] =='undefined'){
+            if (typeof varTmp[keyW] == 'undefined') {
                 varTmp[keyW] = 0;
             }
-            var toExt     = "varTmp[keyW]"+operation+value;
+            var toExt = "varTmp[keyW]" + operation + value;
             eval(toExt);
         }
         core.hideChoose();
-        if(udToEp(chosen.goto) != ''){
-            story      = '';
-            nowChapter = chosen.goto;
+        if (udToEp(chosen.goto) != '') {
+            story         = '';
+            nowChapter    = chosen.goto;
             sentences.pos = 0;
             sentences.getStory();
-        }else {
+        } else {
             finish();
             finish();
         }
 
     },
-    roleHide:function(){
-        $(".roleImg img").each(function(){
+    roleHide: function ()
+    {
+        $(".roleImg img").each(function ()
+        {
             $(this).attr('src', '');
         });
     },
-    roleControl:function(role, pos, isshowName){
+    roleControl: function (role, pos, isshowName)
+    {
         var idName = role.name;
         var rObj   = roles[idName];
         var rPath  = rObj.path;
@@ -554,41 +685,46 @@ var core = {
 
         }
     },
-    finish: function () {
+    finish: function ()
+    {
         clearInterval(core.process);
-        (function () {
-            for (var i = core.pos; i < core.length; i++) {
-                textObj.innerHTML += core.arr[i];
-            }
-        })();
+        for (var i = core.pos; i < core.length; i++) {
+            textObj.innerHTML += core.arr[i];
+        }
         this.ini();
         core.beginNext();
     },
-    beginNext: function () {
+    beginNext: function ()
+    {
         if (auto == 1) {
-            setTimeout(function () {
+            setTimeout(function ()
+            {
                 if (textClear()) {
                     sentences.charge();
                 }
             }, nextSentenceTime);
-        } else if (core.toNext == 1) {
-            sentences.charge();
-            //  waitToClick();
-        } else {
-            core.toNext = 1;
-            setTimeout(function () {
-                waitToClick();
-            }, nextSentenceTime);
-        }
+        } else
+            if (core.toNext == 1) {
+                sentences.charge();
+                //  waitToClick();
+            } else {
+                core.toNext = 1;
+                setTimeout(function ()
+                {
+                    waitToClick();
+                }, nextSentenceTime);
+            }
     },
-    type:function (c) {
+    type: function (c)
+    {
         if (c) {
             core.toType = c;
         }
         this.ini();
         this.start();
     },
-    ini: function () {
+    ini: function ()
+    {
         this.arr    = [];
         this.pos    = 0;
         this.length = 0;
@@ -597,7 +733,8 @@ var core = {
     }
 };
 
-function showName(name, hide) {
+function showName(name, hide)
+{
     if (hide == 1) {
         $('#roleName').hide();
         return;
@@ -608,7 +745,8 @@ function showName(name, hide) {
     }
 }
 
-function hideCover() {
+function hideCover()
+{
     $("#canvas").remove();
     $("#start-scene").remove();
     $("#text").fadeIn(1000);
@@ -616,17 +754,20 @@ function hideCover() {
     clearInterval(initLoadButton);
 }
 
-function start() {
+function start()
+{
     if (!begin) {
         hideCover();
     }
-    setTimeout(function () {
+    setTimeout(function ()
+    {
         begin = 1;
         sentences.getStory();
     }, 1000);
 }
 
-function finish() {
+function finish()
+{
     if (skipping == 1) {
         skipPlay();
         return;
@@ -636,6 +777,9 @@ function finish() {
         return;
     }
     if (end == 1 || begin == 0 || auto == 1) {
+        if (end == 1) {
+            window.location.reload();
+        }
         return;
     }
     if (core.toNext == 1) {
@@ -649,12 +793,14 @@ function finish() {
 
 }
 
-function textClear() {
+function textClear()
+{
     textObj.innerHTML = '';
     return true;
 }
 
-function fin() {
+function fin()
+{
     showName('', 1);
     textClear();
     auto              = 0;
@@ -663,9 +809,10 @@ function fin() {
     core.type('      F     i     n ');
 }
 
-function bgmSwitch() {
+function bgmSwitch()
+{
     var audio = $('#audio')[0];
-    if(event){
+    if (event) {
         event.stopPropagation();
     }
     if (audio.paused) {
@@ -677,7 +824,8 @@ function bgmSwitch() {
     }
 }
 
-function autoPlay() {
+function autoPlay()
+{
     event.stopPropagation();
     if (auto == 0) {
         auto = 1;
@@ -693,8 +841,10 @@ function autoPlay() {
         $('#autoPlay').html('off');
     }
 }
+
 //快进
-function skipPlay() {
+function skipPlay()
+{
     event.stopPropagation();
     var rate = 10;
 
@@ -721,8 +871,10 @@ function skipPlay() {
 
 }
 
-function twinkle(x) {
-    var tkl = setInterval(function () {
+function twinkle(x)
+{
+    var tkl = setInterval(function ()
+    {
         if (core.toNext == 1) {
             x.fadeIn(1000).fadeOut(1000);
         } else {
@@ -732,7 +884,8 @@ function twinkle(x) {
     }, 2000);
 }
 
-function waitToClick() {
+function waitToClick()
+{
     if ($('#waitToClick').length > 0) {
         twinkle($('#waitToClick'));
     } else {
@@ -742,13 +895,15 @@ function waitToClick() {
     }
 }
 
-function showWord(word, rate, color) {
+function showWord(word, rate, color)
+{
     var id = '#showAuto';
     if ($(id).length <= 0) {
         var c = '<span id="showAuto" class="right-corner" style="color:' + color + ';font-size: 20px"> ' + word + '</span>';
         $('.img').append(c);
     }
-    tkAuto = setInterval(function () {
+    tkAuto = setInterval(function ()
+    {
         if (auto == 1) {
             $(id).fadeIn(1000 / rate).fadeOut(1000 / rate);
         } else {
