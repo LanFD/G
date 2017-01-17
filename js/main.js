@@ -36,7 +36,6 @@ var iniMusic = 0;
         alert('此浏览器不支持localStorage，读存档功能将无法使用');
     }
 
-
     $('.roleImg').css('height', $('.img').height() - $('#text').height());
     $(".roleImg").css("bottom", $("#text").height());
 
@@ -71,6 +70,7 @@ window.onload = function ()
     var iniRoleImg = [], n = 0;
     for(var i in roles){
         iniRoleImg[n] = roles[i].path+'default.png';
+        n++;
     }
     preLoad(iniRoleImg, function(){
         if (isMobile == 0) {
@@ -102,26 +102,43 @@ function execFunc(arg, x, n){
         }
     }
 }
-//预加载图片
+//预加载图片,音频
 function preLoad(arr){
     if(arr.length > 0){
-        var arg = arguments;
-        var img = [],count = 0;
+        var arg  = arguments;
+        var item = [],count = 0;
         function loaded(){
             count++;
             if(count == arr.length){
                 execFunc(arg, img, 1);
             }
         }
+        var img   = ['png', 'gif', 'jpeg', 'jpg'];
+        var audio = ['ogg', 'mp3', 'aif', 'midi', 'wav', 'm4a'];
         for(var i in arr){
-            img[i] = new Image();
-            img[i].src = arr[i];
-            img[i].onload = function(){
-                loaded()
-            };
-            img[i].onerror = function(){
-                loaded()
+            var s = arr[i].substring(arr[i].lastIndexOf('.') + 1).toLowerCase();
+            if($.inArray(s, img) != -1){
+                item[i] = new Image();
+                item[i].src = arr[i];
+                item[i].onload = function(){
+                    loaded()
+                };
+                item[i].onerror = function(){
+                    loaded()
+                };
+                continue;
+            }else if($.inArray(s, audio) != -1){
+                item[i] = new Audio();
+                item[i].src = arr[i];
+                item[i].onloadedmetadata = function(){
+                    loaded()
+                };
+                item[i].onerror = function(){
+                    loaded()
+                };
+                continue;
             }
+            loaded();
         }
     }else {
         execFunc(arguments, null, 1);
@@ -448,23 +465,42 @@ var sentences = {
             } else {
                 var toLoad = [],n = 0;
                 for (var i in doScript){
-                    if(typeof doScript[i].scene!= 'undefined' && doScript[i].scene!=''){
+                    if(typeof doScript[i].scene!= 'undefined'){
                         toLoad[n] = scenePath + doScript[i].scene;
+                        n++;
+                    }
+                    if(typeof doScript[i].bgm !='undefined'){
+                        toLoad[n] = 'bgm/' + doScript[i].bgm;
                         n++;
                     }
                     if(typeof doScript[i].role!= 'undefined'){
                         for(var x in doScript[i].role){
+                            toLoad[n] = roles[doScript[i].role[x].name].path + 'default.png';
+                            n++;
                             if(doScript[i].role[x].img){
                                 toLoad[n] = roles[doScript[i].role[x].name].path + doScript[i].role[x].img;
                                 n++;
                             }
-
+                            if(typeof doScript[i].role[x].action !='undefined'){
+                                for(var m in doScript[i].role[x].action){
+                                    if(doScript[i].role[x].action[m].sound){
+                                        toLoad[n] = 'sound/' + doScript[i].role[x].action[m].sound;
+                                        n++;
+                                    }
+                                }
+                            }
                         }
-
                     }
-
                 }
+                $.unique(toLoad);
+                loadNotice(function(t){
+                    t.append('<span>loading</span>');
+                    t.show();
+                });
                 preLoad(toLoad, function(){
+                    loadNotice(function(t){
+                        t.hide();
+                    });
                     cb()
                 });
             }
@@ -517,8 +553,7 @@ var core      = {
         if (typeof (this.toType['bgm']) == 'string') {
             //bgm切换
             $('#audio')[0].pause();
-            $('#audio').attr("src", "bgm/" + this.toType['bgm']);
-            $('#audio')[0].play();
+            $('#audio').attr("src", "bgm/" + this.toType['bgm'])[0].play();
         }
 
         if (typeof (this.toType['hideRole']) == 'number') {
