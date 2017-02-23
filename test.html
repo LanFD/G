@@ -14,11 +14,10 @@
         {
             this.x = x;
             this.y = y;
-        }
-        point2D.prototype.move = function(p2D)
-        {
-            this.x += p2D.x;
-            this.y += p2D.y;
+            this.move = function(p2D){
+                this.x += p2D.x;
+                this.y += p2D.y;
+            }
         }
         function point3D(x, y, z)
         {
