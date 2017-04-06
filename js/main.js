@@ -99,6 +99,18 @@
 
     };
 
+    win.loadSound = function loadSound(url) {
+        var request = new XMLHttpRequest(); //建立一个请求
+        request.open('GET', url, true); //配置好请求类型，文件路径等
+        request.responseType = 'arraybuffer'; //配置数据返回类型
+        // 一旦获取完成，对音频进行进一步操作，比如解码
+        request.onload = function() {
+            var arraybuffer = request.response;
+        };
+        request.send();
+    };
+
+
     win.getRandNum = function getRandNum(min, max)
     {
         return Math.floor(Math.random() * (max - min + 1) + min)
