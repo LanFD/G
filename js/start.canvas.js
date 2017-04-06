@@ -106,7 +106,7 @@
     canvas.height = height;
     ctx           = canvas.getContext('2d');
     eleArr        = [];
-    for (var i = 0; i < Math.sqrt(width * height); i += 10) {
+    for (var i = 0; i < Math.sqrt(width * height); i += 5) {
         eleArr.push(new OriRainDrop());
     }
     startAni();
@@ -152,15 +152,15 @@
             t.y      = Math.random() * height * 1.2;
             t.f_x    = t.x + (middle[0] - t.x) * t.direct;
             t.f_y    = t.y + (middle[1] - t.y) * t.direct;
-            t.r      = 3 + Math.random() * 5; //半径
+            t.r      = 3 + Math.random() * 3; //半径
             t.color    =  //t.x <= width / 2 ? [getRandNum(150, 255), 0, 0] :
                 getRandNum(200, 255);
             t.color    = [t.color, t.color, t.color];
             t.alpha    = MathR(0.6);
-            t.life     = 20 + parseInt(Math.random() * 50);
+            t.life     = 20 + parseInt(Math.random() * 40);
             t.xCal     = (t.f_x - t.x) / t.life;
             t.yCal     = (t.f_y - t.y) / t.life;
-            t.rCal     = t.r / (t.life * 5);
+            t.rCal     = (t.r - t.r * Math.random()*0.5) /t.life;
             t.alphaCal = 1.1 * t.alpha / t.life
         }
 
@@ -173,7 +173,7 @@
                 t.life--;
                 t.x += t.xCal;
                 t.y += t.yCal;
-                t.r = t.r / (1 + t.rCal);
+                t.r -= t.rCal;
                 t.alpha -= t.alphaCal;
             }
             ctx.beginPath();
