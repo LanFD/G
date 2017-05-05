@@ -53,7 +53,7 @@
 
         $('body').on("click", '.mobileIniMusic', function ()
         {
-            bgmSwitch();
+//            bgmSwitch();
             iniMusic = 1;
             //setTimeout(function () {
             //    window.scrollTo(0,addHeight)
@@ -89,7 +89,7 @@
             if (isMobile == 0) {
                 loadNotice(function (t)
                 {
-                    bgmSwitch();
+//                    bgmSwitch();
                     t.hide(1000);
                 });
             } else {
